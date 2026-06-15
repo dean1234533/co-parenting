@@ -1,0 +1,51 @@
+{
+  "name": "ProgressEntry",
+  "type": "object",
+  "properties": {
+    "child_name": {
+      "type": "string",
+      "description": "Name of the child"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "homework",
+        "milestone",
+        "school_report",
+        "artwork",
+        "sports",
+        "other"
+      ],
+      "description": "Type of progress"
+    },
+    "title": {
+      "type": "string",
+      "description": "Title of the entry"
+    },
+    "description": {
+      "type": "string",
+      "description": "Details"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the entry"
+    },
+    "photo_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Photos of work or the child"
+    },
+    "posted_by": {
+      "type": "string",
+      "description": "Who posted it"
+    }
+  },
+  "required": [
+    "child_name",
+    "title",
+    "category"
+  ]
+}

@@ -1,0 +1,95 @@
+{
+  "name": "DailyLog",
+  "type": "object",
+  "properties": {
+    "child_name": {
+      "type": "string",
+      "description": "Name of the child"
+    },
+    "log_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the log"
+    },
+    "meals": {
+      "type": "object",
+      "properties": {
+        "breakfast": {
+          "type": "string"
+        },
+        "lunch": {
+          "type": "string"
+        },
+        "dinner": {
+          "type": "string"
+        },
+        "snacks": {
+          "type": "string"
+        }
+      },
+      "description": "What the child ate"
+    },
+    "tv_watched": {
+      "type": "string",
+      "description": "What the child watched on TV/screens"
+    },
+    "screen_time_minutes": {
+      "type": "number",
+      "description": "Total screen time in minutes"
+    },
+    "medicine_given": {
+      "type": "boolean",
+      "default": false,
+      "description": "Was any medicine given"
+    },
+    "medicine_details": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "dose": {
+            "type": "string"
+          },
+          "time": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Details of medicine given"
+    },
+    "bedtime": {
+      "type": "string",
+      "description": "What time the child went to bed"
+    },
+    "wake_time": {
+      "type": "string",
+      "description": "What time the child woke up"
+    },
+    "mood": {
+      "type": "string",
+      "enum": [
+        "happy",
+        "okay",
+        "unsettled",
+        "upset",
+        "unwell"
+      ],
+      "description": "Overall mood of the child"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Any other notes for the day"
+    },
+    "logged_by": {
+      "type": "string",
+      "description": "Which parent logged this"
+    }
+  },
+  "required": [
+    "child_name",
+    "log_date"
+  ]
+}

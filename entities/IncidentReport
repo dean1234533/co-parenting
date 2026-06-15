@@ -1,0 +1,67 @@
+{
+  "name": "IncidentReport",
+  "type": "object",
+  "properties": {
+    "child_name": {
+      "type": "string",
+      "description": "Name of the child"
+    },
+    "incident_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the incident occurred"
+    },
+    "description": {
+      "type": "string",
+      "description": "What happened"
+    },
+    "injury_type": {
+      "type": "string",
+      "enum": [
+        "bump",
+        "cut",
+        "bruise",
+        "burn",
+        "fall",
+        "illness",
+        "allergic_reaction",
+        "other"
+      ],
+      "description": "Type of injury"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "minor",
+        "moderate",
+        "serious"
+      ],
+      "default": "minor"
+    },
+    "action_taken": {
+      "type": "string",
+      "description": "What was done about it"
+    },
+    "photo_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Photos of the injury"
+    },
+    "reported_by": {
+      "type": "string",
+      "description": "Who reported it"
+    },
+    "medical_attention": {
+      "type": "boolean",
+      "default": false,
+      "description": "Was medical attention needed"
+    }
+  },
+  "required": [
+    "child_name",
+    "description",
+    "incident_date"
+  ]
+}

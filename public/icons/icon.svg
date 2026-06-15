@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#7c3aed"/>
+  <!-- Heart shape -->
+  <path d="M256 380 C256 380 112 290 112 190 C112 148 146 116 186 116 C214 116 238 132 256 156 C274 132 298 116 326 116 C366 116 400 148 400 190 C400 290 256 380 256 380Z" fill="white"/>
+  <!-- Two small circles representing children/people -->
+  <circle cx="210" cy="210" r="22" fill="#7c3aed"/>
+  <circle cx="302" cy="210" r="22" fill="#7c3aed"/>
+  <!-- Smile arc -->
+  <path d="M210 245 Q256 275 302 245" stroke="#7c3aed" stroke-width="10" fill="none" stroke-linecap="round"/>
+</svg>

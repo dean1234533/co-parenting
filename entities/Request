@@ -1,0 +1,56 @@
+{
+  "name": "Request",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "running_late",
+        "holiday",
+        "schedule_change",
+        "other"
+      ],
+      "description": "Type of request"
+    },
+    "title": {
+      "type": "string",
+      "description": "Brief title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description"
+    },
+    "date_from": {
+      "type": "string",
+      "format": "date",
+      "description": "Start date"
+    },
+    "date_to": {
+      "type": "string",
+      "format": "date",
+      "description": "End date (optional)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "approved",
+        "denied"
+      ],
+      "default": "pending",
+      "description": "Approval status"
+    },
+    "response_note": {
+      "type": "string",
+      "description": "Note from the person responding"
+    },
+    "requester_name": {
+      "type": "string",
+      "description": "Name of the person making the request"
+    }
+  },
+  "required": [
+    "type",
+    "title"
+  ]
+}

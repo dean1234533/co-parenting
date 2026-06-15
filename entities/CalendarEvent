@@ -1,0 +1,50 @@
+{
+  "name": "CalendarEvent",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Event title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Event details"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Event date"
+    },
+    "time": {
+      "type": "string",
+      "description": "Event time"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "pickup",
+        "dropoff",
+        "school",
+        "medical",
+        "activity",
+        "holiday",
+        "birthday",
+        "other"
+      ],
+      "description": "Type of event"
+    },
+    "child_name": {
+      "type": "string",
+      "description": "Which child this relates to"
+    },
+    "added_by": {
+      "type": "string",
+      "description": "Who added this event"
+    }
+  },
+  "required": [
+    "title",
+    "date",
+    "event_type"
+  ]
+}

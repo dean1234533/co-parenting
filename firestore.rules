@@ -1,0 +1,86 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
+
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function inSameFamily(familyId) {
+      return getUserData().familyId == familyId;
+    }
+
+    // User profiles — only the owner can read/write their own
+    match /users/{uid} {
+      allow read: if isAuthenticated() && (isOwner(uid) || getUserData().partnerId == uid);
+      allow create: if isAuthenticated() && isOwner(uid);
+      allow update: if isAuthenticated() && isOwner(uid);
+    }
+
+    // Families — readable by members
+    match /families/{familyId} {
+      allow read: if isAuthenticated() && (
+        resource.data.member1Id == request.auth.uid ||
+        resource.data.member2Id == request.auth.uid
+      );
+      allow write: if isAuthenticated();
+    }
+
+    // Invites — anyone authenticated can read (to accept), only creator can write
+    match /invites/{token} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated();
+    }
+
+    // FCM tokens — owner can write; owner or linked partner can read
+    // Partner read access is needed so the Cloudflare notify function can fetch
+    // the recipient's token using the sender's verified ID token
+    match /fcmTokens/{uid} {
+      allow read: if isAuthenticated() && (isOwner(uid) || getUserData().partnerId == uid);
+      allow write: if isAuthenticated() && isOwner(uid);
+    }
+
+    // All shared family collections — scoped to familyId
+    match /chatMessages/{docId} {
+      allow read, write: if isAuthenticated() && inSameFamily(resource.data.familyId);
+      allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId);
+    }
+    match /calendarEvents/{docId} {
+      allow read, write: if isAuthenticated() && inSameFamily(resource.data.familyId);
+      allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId);
+    }
+    match /requests/{docId} {
+      allow read, write: if isAuthenticated() && inSameFamily(resource.data.familyId);
+      allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId);
+    }
+    match /incidentReports/{docId} {
+      allow read, write: if isAuthenticated() && inSameFamily(resource.data.familyId);
+      allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId);
+    }
+    match /expenses/{docId} {
+      allow read, write: if isAuthenticated() && inSameFamily(resource.data.familyId);
+      allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId);
+    }
+    match /dailyLogs/{docId} {
+      allow read, write: if isAuthenticated() && inSameFamily(resource.data.familyId);
+      allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId);
+    }
+    match /progressEntries/{docId} {
+      allow read, write: if isAuthenticated() && inSameFamily(resource.data.familyId);
+      allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId);
+    }
+    match /coParentingRules/{docId} {
+      allow read, write: if isAuthenticated() && inSameFamily(resource.data.familyId);
+      allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId);
+    }
+  }
+}

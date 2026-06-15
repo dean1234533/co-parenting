@@ -1,0 +1,35 @@
+{
+  "name": "CoParentingRule",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Rule title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Rule details"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "communication",
+        "schedule",
+        "financial",
+        "medical",
+        "education",
+        "general"
+      ],
+      "description": "Rule category"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "description": "Is the rule active"
+    }
+  },
+  "required": [
+    "title",
+    "description"
+  ]
+}
