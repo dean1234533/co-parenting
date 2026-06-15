@@ -39,8 +39,7 @@ export default defineConfig({
         ],
       },
       injectManifest: {
-        swSrc: 'src/sw.js',
-        swDest: 'sw.js',
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,woff2}'],
       },
       devOptions: {
         enabled: true,
