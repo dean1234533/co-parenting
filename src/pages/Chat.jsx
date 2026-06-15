@@ -1,4 +1,4 @@
-import db, { getFamilyId } from '@/api/db';
+import db from '@/api/db';
 import { sendPartnerNotification } from '@/lib/notify';
 
 import React, { useState, useRef, useEffect } from "react";
@@ -31,8 +31,13 @@ export default function Chat() {
 
   // Real-time Firestore listener — no polling
   useEffect(() => {
-    const familyId = getFamilyId();
-    if (!familyId) return;
+    const familyId = profile?.familyId;
+    if (!familyId) {
+      setLoadingMessages(false);
+      return;
+    }
+
+    setLoadingMessages(true);
 
     const q = query(
       collection(firestore, 'chatMessages'),
@@ -41,10 +46,17 @@ export default function Chat() {
       limit(200)
     );
 
-    const unsub = onSnapshot(q, (snapshot) => {
-      setMessages(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
-      setLoadingMessages(false);
-    });
+    const unsub = onSnapshot(
+      q,
+      (snapshot) => {
+        setMessages(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+        setLoadingMessages(false);
+      },
+      (error) => {
+        console.error('Chat snapshot error:', error);
+        setLoadingMessages(false);
+      }
+    );
 
     return () => unsub();
   }, [profile?.familyId]);
@@ -115,7 +127,14 @@ export default function Chat() {
       {/* Messages Area */}
       <Card className="flex-1 overflow-hidden flex flex-col">
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {loadingMessages ? (
+          {!profile?.familyId ? (
+            <div className="flex items-center justify-center h-full text-center px-6">
+              <p className="text-muted-foreground text-sm">
+                Link with your co-parent first to start messaging.<br />
+                Use <strong>Invite co-parent</strong> in the sidebar.
+              </p>
+            </div>
+          ) : loadingMessages ? (
             <div className="flex items-center justify-center h-full">
               <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             </div>
@@ -193,7 +212,7 @@ export default function Chat() {
             />
             <Button
               onClick={handleSend}
-              disabled={!message.trim() || sendMutation.isPending || !!warning}
+              disabled={!message.trim() || sendMutation.isPending || !!warning || !profile?.familyId}
               className="px-6"
             >
               <Send className="h-4 w-4" />
