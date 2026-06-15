@@ -85,7 +85,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",
-    "vite-plugin-pwa": "^0.20.5",
+    "vite-plugin-pwa": "^0.21.0",
     "workbox-build": "^7.1.1",
     "@types/node": "^22.13.5",
     "@types/react": "^18.2.66",
