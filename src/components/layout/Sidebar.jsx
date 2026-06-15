@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   MessageSquare, CalendarDays, AlertTriangle, GraduationCap,
   PoundSterling, Receipt, FileText, BookOpen, ClipboardCheck,
-  Home, Menu, X, ChevronRight, Heart, NotebookPen, Bell, BellOff, BellRing, UserPlus
+  Home, Menu, X, ChevronRight, Heart, NotebookPen, Bell, BellOff, BellRing, UserPlus, Baby
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,7 @@ const navItems = [
   { path: "/finances", label: "Finances", icon: PoundSterling },
   { path: "/receipts", label: "Receipts", icon: Receipt },
   { path: "/daily-log", label: "Daily Log", icon: NotebookPen },
+  { path: "/children", label: "Children", icon: Baby },
   { path: "/rules", label: "Rules", icon: BookOpen },
   { path: "/export", label: "Export PDF", icon: FileText },
 ];

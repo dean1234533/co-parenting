@@ -82,5 +82,9 @@ service cloud.firestore {
       allow read, write: if isAuthenticated() && inSameFamily(resource.data.familyId);
       allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId);
     }
+    match /children/{docId} {
+      allow read, write: if isAuthenticated() && inSameFamily(resource.data.familyId);
+      allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId);
+    }
   }
 }

@@ -32,6 +32,7 @@ import CalendarPage from "@/pages/Calendar";
 import Rules from "@/pages/Rules";
 import ExportPDF from "@/pages/ExportPDF";
 import DailyLog from "@/pages/DailyLog";
+import Children from "@/pages/Children";
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, authChecked, isAuthenticated, profile } = useAuth();
@@ -68,6 +69,7 @@ const AuthenticatedApp = () => {
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/rules" element={<Rules />} />
           <Route path="/daily-log" element={<DailyLog />} />
+          <Route path="/children" element={<Children />} />
           <Route path="/export" element={<ExportPDF />} />
         </Route>
       </Route>
