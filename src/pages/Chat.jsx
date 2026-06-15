@@ -1,13 +1,15 @@
-import db from '@/api/db';
+import db, { getFamilyId } from '@/api/db';
 import { sendPartnerNotification } from '@/lib/notify';
 
 import React, { useState, useRef, useEffect } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
+import { firestore } from '@/lib/firebase';
+import { useAuth } from '@/lib/AuthContext';
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Send, ShieldAlert, AlertCircle } from "lucide-react";
 import { containsProfanity, getBlockedWord } from "@/lib/profanityFilter";
 import { format } from "date-fns";
@@ -17,27 +19,41 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function Chat() {
   const [message, setMessage] = useState("");
   const [warning, setWarning] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(true);
   const messagesEndRef = useRef(null);
-  const queryClient = useQueryClient();
+  const { profile } = useAuth();
 
   const { data: currentUser } = useQuery({
     queryKey: ["me"],
     queryFn: () => db.auth.me(),
   });
 
-  const { data: messages = [], isLoading } = useQuery({
-    queryKey: ["chat-messages"],
-    queryFn: () => db.entities.ChatMessage.list("-created_date", 100),
-    refetchInterval: 3000,
-  });
+  // Real-time Firestore listener — no polling
+  useEffect(() => {
+    const familyId = getFamilyId();
+    if (!familyId) return;
+
+    const q = query(
+      collection(firestore, 'chatMessages'),
+      where('familyId', '==', familyId),
+      orderBy('created_date', 'asc'),
+      limit(200)
+    );
+
+    const unsub = onSnapshot(q, (snapshot) => {
+      setMessages(snapshot.docs.map((d) => ({ id: d.id, ...d.data() })));
+      setLoadingMessages(false);
+    });
+
+    return () => unsub();
+  }, [profile?.familyId]);
 
   const sendMutation = useMutation({
     mutationFn: (data) => db.entities.ChatMessage.create(data),
     onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: ["chat-messages"] });
       setMessage("");
       setWarning("");
-      // Notify partner
       sendPartnerNotification({
         title: variables.sender_name || 'CoParent',
         body: `${variables.sender_name || 'Your co-parent'} sent you a message`,
@@ -83,8 +99,6 @@ export default function Chat() {
     }
   };
 
-  const sortedMessages = [...messages].reverse();
-
   return (
     <div className="flex flex-col h-[calc(100vh-6rem)] lg:h-[calc(100vh-4rem)]">
       {/* Header */}
@@ -101,17 +115,17 @@ export default function Chat() {
       {/* Messages Area */}
       <Card className="flex-1 overflow-hidden flex flex-col">
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {isLoading ? (
+          {loadingMessages ? (
             <div className="flex items-center justify-center h-full">
               <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : sortedMessages.length === 0 ? (
+          ) : messages.length === 0 ? (
             <div className="flex items-center justify-center h-full text-muted-foreground">
               <p>No messages yet. Start a conversation.</p>
             </div>
           ) : (
-            <AnimatePresence>
-              {sortedMessages.map((msg) => {
+            <AnimatePresence initial={false}>
+              {messages.map((msg) => {
                 const isMe = msg.created_by_id === currentUser?.id;
                 return (
                   <motion.div
