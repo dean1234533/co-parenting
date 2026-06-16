@@ -108,7 +108,7 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-6rem)] lg:h-[calc(100vh-4rem)]">
+    <div className="flex flex-col" style={{height: 'calc(100dvh - 6rem)'}}>
       {/* Header */}
       <div className="mb-4">
         <h1 className="text-3xl font-heading font-bold">Messages</h1>

@@ -109,15 +109,14 @@
 
   body {
     @apply bg-background text-foreground font-body;
-    overflow-x: hidden;
-    overscroll-behavior: none;
+    /* Do NOT set overflow-x:hidden here — it blocks vertical scroll on iOS Safari */
+    overscroll-behavior-x: none;
     min-height: 100dvh;
     min-height: 100vh;
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
-    position: relative;
     width: 100%;
   }
 
