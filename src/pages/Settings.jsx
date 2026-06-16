@@ -2,17 +2,15 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { auth, firestore } from '@/lib/firebase';
-import { doc, deleteDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Trash2, LogOut, ShieldAlert, FileText, Phone, Check, CalendarDays, Link2, Unlink, Archive, Loader2, Clock } from 'lucide-react';
+import { Trash2, LogOut, ShieldAlert, FileText, Check, CalendarDays, Link2, Unlink, Archive, Loader2, Clock } from 'lucide-react';
 import { isConnected, disconnect } from '@/lib/googleCalendar';
 import { exportThenDeleteOldData, RETENTION_MONTHS, retentionCutoff } from '@/lib/dataRetention';
 import { format } from 'date-fns';
@@ -22,13 +20,6 @@ export default function Settings() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
-  const [phone, setPhone] = useState(profile?.phoneNumber || '');
-  const [savingPhone, setSavingPhone] = useState(false);
-  const [phoneSaved, setPhoneSaved] = useState(false);
-  const [backupName, setBackupName] = useState(profile?.backupContactName || '');
-  const [backupPhone, setBackupPhone] = useState(profile?.backupContactPhone || '');
-  const [savingBackup, setSavingBackup] = useState(false);
-  const [backupSaved, setBackupSaved] = useState(false);
   const [gcalConnected, setGcalConnected] = useState(isConnected());
   const [cleaningUp, setCleaningUp] = useState(false);
   const [cleanupResult, setCleanupResult] = useState(null); // null | number
@@ -49,46 +40,14 @@ export default function Settings() {
     }
   };
 
-  const handleSavePhone = async () => {
-    setSavingPhone(true);
-    try {
-      await updateDoc(doc(firestore, 'users', auth.currentUser.uid), {
-        phoneNumber: phone.trim(),
-      });
-      setPhoneSaved(true);
-      setTimeout(() => setPhoneSaved(false), 2500);
-    } catch (err) {
-      console.error('Save phone error:', err);
-    } finally {
-      setSavingPhone(false);
-    }
-  };
-
-  const handleSaveBackup = async () => {
-    setSavingBackup(true);
-    try {
-      await updateDoc(doc(firestore, 'users', auth.currentUser.uid), {
-        backupContactName: backupName.trim(),
-        backupContactPhone: backupPhone.trim(),
-      });
-      setBackupSaved(true);
-      setTimeout(() => setBackupSaved(false), 2500);
-    } catch (err) {
-      console.error('Save backup contact error:', err);
-    } finally {
-      setSavingBackup(false);
-    }
-  };
-
   const handleDeleteAccount = async () => {
     setDeleting(true);
     setError('');
     try {
       const user = auth.currentUser;
 
-      // If linked, leave a pendingLink for the partner so they get unlinked on next load.
-      // We write to pendingLinks (which any authenticated user can write to) rather than
-      // the partner's /users doc (which we can't write to under Firestore rules).
+      // Leave a pendingLink for the partner so they get unlinked on next load.
+      // pendingLinks allows writes from any authenticated user.
       if (profile?.partnerId) {
         await setDoc(doc(firestore, 'pendingLinks', profile.partnerId), {
           familyId: profile.partnerId,
@@ -98,19 +57,22 @@ export default function Settings() {
         });
       }
 
-      // Call the Cloudflare function which uses the service account to delete the
-      // Firebase Auth user — this bypasses the client-side "requires-recent-login" error.
-      const idToken = await user.getIdToken();
+      // Get a fresh token for the server call
+      const idToken = await user.getIdToken(true);
+
       const res = await fetch('/api/delete-account', {
         method: 'POST',
-        headers: { Authorization: `Bearer ${idToken}` },
+        headers: { Authorization: `Bearer ${idToken}`, 'Content-Type': 'application/json' },
       });
 
+      const body = await res.json().catch(() => ({}));
+
       if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
         throw new Error(body.error || `Server error ${res.status}`);
       }
 
+      // Whether or not the Auth record was removed, the Firestore data is gone.
+      // Sign out locally so the user is fully logged out.
       window.location.href = '/login';
     } catch (err) {
       console.error('Delete account error:', err);
@@ -150,70 +112,7 @@ export default function Settings() {
         </CardContent>
       </Card>
 
-      {/* Emergency contact phone number */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Phone className="h-4 w-4" /> Emergency Contact Number
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <p className="text-xs text-muted-foreground">
-            Your co-parent can save these numbers to their phone contacts with one tap from the dashboard — useful in an emergency.
-          </p>
 
-          {/* Your own number */}
-          <div>
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Your mobile number</Label>
-            <div className="flex gap-2 mt-1">
-              <Input
-                type="tel"
-                placeholder="+44 7700 900000"
-                value={phone}
-                onChange={(e) => { setPhone(e.target.value); setPhoneSaved(false); }}
-              />
-              <Button
-                onClick={handleSavePhone}
-                disabled={savingPhone || !phone.trim()}
-                className="shrink-0 gap-1.5"
-              >
-                {phoneSaved ? <><Check className="h-4 w-4" /> Saved</> : savingPhone ? 'Saving…' : 'Save'}
-              </Button>
-            </div>
-          </div>
-
-          {/* Backup contact */}
-          <div className="pt-2 border-t border-border">
-            <Label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Backup contact (e.g. grandparent)</Label>
-            <p className="text-xs text-muted-foreground/70 mt-0.5 mb-2">
-              A second person your co-parent can reach if you're not available.
-            </p>
-            <div className="space-y-2">
-              <Input
-                type="text"
-                placeholder="Name (e.g. Grandma Mary)"
-                value={backupName}
-                onChange={(e) => { setBackupName(e.target.value); setBackupSaved(false); }}
-              />
-              <div className="flex gap-2">
-                <Input
-                  type="tel"
-                  placeholder="+44 7700 900001"
-                  value={backupPhone}
-                  onChange={(e) => { setBackupPhone(e.target.value); setBackupSaved(false); }}
-                />
-                <Button
-                  onClick={handleSaveBackup}
-                  disabled={savingBackup || !backupName.trim() || !backupPhone.trim()}
-                  className="shrink-0 gap-1.5"
-                >
-                  {backupSaved ? <><Check className="h-4 w-4" /> Saved</> : savingBackup ? 'Saving…' : 'Save'}
-                </Button>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Google Calendar */}
       {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
