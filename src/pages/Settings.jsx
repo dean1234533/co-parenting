@@ -21,6 +21,8 @@ export default function Settings() {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
   const [gcalConnected, setGcalConnected] = useState(isConnected());
+  const [gcalError, setGcalError] = useState('');
+  const [gcalLoading, setGcalLoading] = useState(false);
   const [cleaningUp, setCleaningUp] = useState(false);
   const [cleanupResult, setCleanupResult] = useState(null); // null | number
   const [showCleanupConfirm, setShowCleanupConfirm] = useState(false);
@@ -137,29 +139,42 @@ export default function Settings() {
                   variant="outline"
                   size="sm"
                   className="gap-1.5 text-destructive hover:text-destructive"
-                  onClick={() => { disconnect(); setGcalConnected(false); }}
+                  onClick={() => { disconnect(); setGcalConnected(false); setGcalError(''); }}
                 >
                   <Unlink className="h-3.5 w-3.5" />
                   Disconnect
                 </Button>
               </div>
             ) : (
-              <Button
-                variant="outline"
-                className="w-full gap-2"
-                onClick={async () => {
-                  try {
-                    const { requestToken } = await import('@/lib/googleCalendar');
-                    await requestToken();
-                    setGcalConnected(true);
-                  } catch (err) {
-                    console.error('Google auth error:', err);
+              <>
+                <Button
+                  variant="outline"
+                  className="w-full gap-2"
+                  disabled={gcalLoading}
+                  onClick={async () => {
+                    setGcalError('');
+                    setGcalLoading(true);
+                    try {
+                      const { requestToken } = await import('@/lib/googleCalendar');
+                      await requestToken();
+                      setGcalConnected(true);
+                    } catch (err) {
+                      console.error('Google auth error:', err);
+                      setGcalError(err.message || 'Failed to connect Google Calendar. Please try again.');
+                    } finally {
+                      setGcalLoading(false);
+                    }
+                  }}
+                >
+                  {gcalLoading
+                    ? <><Loader2 className="h-4 w-4 animate-spin" /> Connecting…</>
+                    : <><Link2 className="h-4 w-4 text-[#4285F4]" /> Connect Google Calendar</>
                   }
-                }}
-              >
-                <Link2 className="h-4 w-4 text-[#4285F4]" />
-                Connect Google Calendar
-              </Button>
+                </Button>
+                {gcalError && (
+                  <p className="text-xs text-destructive mt-1">{gcalError}</p>
+                )}
+              </>
             )}
           </CardContent>
         </Card>
