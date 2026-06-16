@@ -1,8 +1,8 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { auth, firestore } from '@/lib/firebase';
 import { setFamilyId } from '@/api/db';
-import { getUserProfile, createUserProfile } from '@/lib/userProfile';
 
 const AuthContext = createContext();
 
@@ -12,48 +12,82 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
+  const profileUnsubRef = useRef(null);
 
-  const loadProfile = async (firebaseUser) => {
-    let p = await getUserProfile(firebaseUser.uid);
-    if (!p) {
-      // First time — auto-create a minimal profile from Firebase Auth data
-      p = await createUserProfile(firebaseUser.uid, {
-        displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
-        email: firebaseUser.email,
-      });
-    }
+  const applyProfile = (uid, data) => {
+    const p = { id: uid, ...data };
     setProfile(p);
-    setFamilyId(p.familyId || firebaseUser.uid);
+    setFamilyId(p.familyId || uid);
     return p;
   };
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-      if (firebaseUser) {
-        const p = await loadProfile(firebaseUser);
+  const subscribeToProfile = (firebaseUser) => {
+    // Tear down any existing listener
+    if (profileUnsubRef.current) profileUnsubRef.current();
+
+    const profileRef = doc(firestore, 'users', firebaseUser.uid);
+    let firstSnapshot = true;
+
+    const unsub = onSnapshot(profileRef, async (snap) => {
+      if (!snap.exists()) {
+        // First login — create profile
+        const newProfile = {
+          displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+          email: firebaseUser.email,
+          familyId: firebaseUser.uid,
+          partnerId: null,
+          partnerName: null,
+          createdAt: new Date().toISOString(),
+        };
+        await setDoc(profileRef, newProfile);
+        // onSnapshot will fire again with the created doc
+        return;
+      }
+
+      const p = applyProfile(firebaseUser.uid, snap.data());
+
+      if (firstSnapshot) {
+        firstSnapshot = false;
         setUser({
           id: firebaseUser.uid,
           full_name: p.displayName || firebaseUser.email?.split('@')[0] || 'User',
           email: firebaseUser.email,
         });
         setIsAuthenticated(true);
+        setIsLoadingAuth(false);
+        setAuthChecked(true);
+      }
+    }, (err) => {
+      console.error('Profile listener error:', err);
+      setIsLoadingAuth(false);
+      setAuthChecked(true);
+    });
+
+    profileUnsubRef.current = unsub;
+  };
+
+  useEffect(() => {
+    const unsubAuth = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        subscribeToProfile(firebaseUser);
       } else {
+        if (profileUnsubRef.current) profileUnsubRef.current();
         setUser(null);
         setProfile(null);
         setIsAuthenticated(false);
         setFamilyId(null);
+        setIsLoadingAuth(false);
+        setAuthChecked(true);
       }
-      setIsLoadingAuth(false);
-      setAuthChecked(true);
     });
-    return unsubscribe;
+    return () => {
+      unsubAuth();
+      if (profileUnsubRef.current) profileUnsubRef.current();
+    };
   }, []);
 
   const refreshProfile = async () => {
-    if (auth.currentUser) {
-      const p = await loadProfile(auth.currentUser);
-      setUser((prev) => prev ? { ...prev, full_name: p.displayName } : prev);
-    }
+    // No-op — profile auto-updates via onSnapshot
   };
 
   const logout = async (shouldRedirect = true) => {
