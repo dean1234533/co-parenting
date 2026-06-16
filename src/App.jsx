@@ -23,6 +23,7 @@ import Privacy from "@/pages/Privacy";
 import AppLayout from "@/components/layout/AppLayout";
 
 // Pages
+import Landing from "@/pages/Landing";
 import Dashboard from "@/pages/Dashboard";
 import Chat from "@/pages/Chat";
 import Requests from "@/pages/Requests";
@@ -55,16 +56,17 @@ const AuthenticatedApp = () => {
 
   return (
     <Routes>
-      <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <Login />} />
-      <Route path="/register" element={isAuthenticated ? <Navigate to="/" replace /> : <Register />} />
+      <Route path="/login" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />} />
+      <Route path="/register" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/invite/:token" element={<AcceptInvite />} />
       <Route path="/terms" element={<Terms />} />
       <Route path="/privacy" element={<Privacy />} />
+      <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" replace /> : <Landing />} />
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
         <Route element={<AppLayout />}>
-          <Route path="/" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/requests" element={<Requests />} />
           <Route path="/incidents" element={<Incidents />} />

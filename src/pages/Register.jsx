@@ -38,7 +38,7 @@ export default function Register() {
         });
       }
       const next = new URLSearchParams(window.location.search).get('next');
-      window.location.href = next || '/';
+      window.location.href = next || '/dashboard';
     } catch (err) {
       setError(err.message || "Registration failed");
     } finally {

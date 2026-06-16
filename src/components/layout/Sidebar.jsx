@@ -19,7 +19,7 @@ import { unlinkPartners } from '@/lib/userProfile';
 import { auth } from '@/lib/firebase';
 
 const navItems = [
-  { path: "/", label: "Dashboard", icon: Home },
+  { path: "/dashboard", label: "Dashboard", icon: Home },
   { path: "/chat", label: "Messages", icon: MessageSquare },
   { path: "/requests", label: "Requests", icon: ClipboardCheck },
   { path: "/calendar", label: "Calendar", icon: CalendarDays },
