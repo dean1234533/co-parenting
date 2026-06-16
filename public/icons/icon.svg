@@ -2,34 +2,24 @@
   <!-- Background -->
   <rect width="512" height="512" rx="100" fill="#7c3aed"/>
 
-  <!-- SMALL CHILD (left) -->
-  <circle cx="110" cy="295" r="28" fill="white"/>
-  <circle cx="100" cy="288" r="4" fill="#7c3aed"/>
-  <circle cx="120" cy="288" r="4" fill="#7c3aed"/>
-  <path d="M100 300 Q110 312 120 300" stroke="#7c3aed" stroke-width="4" fill="none" stroke-linecap="round"/>
-  <path d="M110 323 L110 390" stroke="white" stroke-width="22" stroke-linecap="round"/>
-  <path d="M110 390 L90 440" stroke="white" stroke-width="16" stroke-linecap="round"/>
-  <path d="M110 390 L130 440" stroke="white" stroke-width="16" stroke-linecap="round"/>
+  <!-- Palm -->
+  <rect x="172" y="280" width="168" height="140" rx="40" fill="white"/>
 
-  <!-- TEEN (middle, taller) -->
-  <circle cx="256" cy="248" r="36" fill="white"/>
-  <circle cx="244" cy="240" r="5" fill="#7c3aed"/>
-  <circle cx="268" cy="240" r="5" fill="#7c3aed"/>
-  <path d="M242 258 Q256 272 270 258" stroke="#7c3aed" stroke-width="5" fill="none" stroke-linecap="round"/>
-  <path d="M256 284 L256 390" stroke="white" stroke-width="28" stroke-linecap="round"/>
-  <path d="M256 390 L232 445" stroke="white" stroke-width="20" stroke-linecap="round"/>
-  <path d="M256 390 L280 445" stroke="white" stroke-width="20" stroke-linecap="round"/>
+  <!-- Index finger (pointing up) -->
+  <rect x="222" y="110" width="68" height="200" rx="34" fill="white"/>
 
-  <!-- ADULT (right, tallest) -->
-  <circle cx="400" cy="175" r="46" fill="white"/>
-  <circle cx="386" cy="166" r="6" fill="#7c3aed"/>
-  <circle cx="414" cy="166" r="6" fill="#7c3aed"/>
-  <path d="M384 187 Q400 203 416 187" stroke="#7c3aed" stroke-width="6" fill="none" stroke-linecap="round"/>
-  <path d="M400 221 L400 390" stroke="white" stroke-width="36" stroke-linecap="round"/>
-  <path d="M400 390 L372 448" stroke="white" stroke-width="24" stroke-linecap="round"/>
-  <path d="M400 390 L428 448" stroke="white" stroke-width="24" stroke-linecap="round"/>
+  <!-- Middle finger (slightly lower) -->
+  <rect x="298" y="155" width="58" height="160" rx="29" fill="white"/>
 
-  <!-- Arrow line under feet showing progression -->
-  <path d="M82 460 L450 460" stroke="white" stroke-width="6" stroke-linecap="round" opacity="0.4"/>
-  <path d="M435 448 L452 460 L435 472" stroke="white" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+  <!-- Ring finger -->
+  <rect x="362" y="195" width="50" height="130" rx="25" fill="white"/>
+
+  <!-- Pinky -->
+  <rect x="416" y="230" width="42" height="105" rx="21" fill="white"/>
+
+  <!-- Thumb -->
+  <path d="M172 310 Q130 290 122 340 Q118 380 155 390 L172 390 Z" fill="white"/>
+
+  <!-- Upward arrow above finger tip -->
+  <path d="M256 70 L226 108 L246 108 L246 58 L266 58 L266 108 L286 108 Z" fill="white" opacity="0.5"/>
 </svg>
