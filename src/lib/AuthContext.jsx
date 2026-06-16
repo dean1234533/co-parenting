@@ -3,6 +3,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, onSnapshot, setDoc } from 'firebase/firestore';
 import { auth, firestore } from '@/lib/firebase';
 import { setFamilyId } from '@/api/db';
+import { applyPendingLink } from '@/lib/userProfile';
 
 const AuthContext = createContext();
 
@@ -44,10 +45,15 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      const p = applyProfile(firebaseUser.uid, snap.data());
+      let p = applyProfile(firebaseUser.uid, snap.data());
 
       // Persist name so login page can greet returning users
       if (p.displayName) localStorage.setItem('coparent_name', p.displayName);
+
+      // Apply any pending link left by a partner (avoids cross-user writes)
+      if (!p.partnerId) {
+        applyPendingLink(firebaseUser.uid).catch(() => {});
+      }
 
       if (firstSnapshot) {
         firstSnapshot = false;

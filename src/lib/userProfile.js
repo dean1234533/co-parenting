@@ -13,13 +13,12 @@ export async function createUserProfile(uid, { displayName, email }) {
   const profile = {
     displayName,
     email,
-    familyId: uid,   // solo family until linked with partner
+    familyId: uid,
     partnerId: null,
     partnerName: null,
     createdAt: new Date().toISOString(),
   };
   await setDoc(doc(firestore, 'users', uid), profile);
-  // Also update Firebase Auth display name
   if (auth.currentUser) {
     await updateProfile(auth.currentUser, { displayName });
   }
@@ -33,48 +32,64 @@ export async function updateUserProfile(uid, data) {
   }
 }
 
-export async function linkPartners(myUid, partnerUid, myName, partnerName) {
-  // Generate a shared familyId (use the inviter's uid as the family root)
-  const familyId = `family_${myUid}`;
+export async function linkPartners(inviterUid, acceptorUid, inviterName, acceptorName) {
+  const familyId = `family_${inviterUid}`;
 
+  // Create shared family document (any authenticated user can write)
   await setDoc(doc(firestore, 'families', familyId), {
-    member1Id: myUid,
-    member1Name: myName,
-    member2Id: partnerUid,
-    member2Name: partnerName,
+    member1Id: inviterUid,
+    member1Name: inviterName,
+    member2Id: acceptorUid,
+    member2Name: acceptorName,
     createdAt: new Date().toISOString(),
   });
 
-  await updateDoc(doc(firestore, 'users', myUid), {
+  // Update acceptor's OWN doc (they own it — always allowed)
+  await updateDoc(doc(firestore, 'users', acceptorUid), {
     familyId,
-    partnerId: partnerUid,
-    partnerName,
+    partnerId: inviterUid,
+    partnerName: inviterName,
   });
 
-  await updateDoc(doc(firestore, 'users', partnerUid), {
+  // Leave a pending link for the inviter — they apply it to their own doc on next load
+  // (avoids needing cross-user write permissions)
+  await setDoc(doc(firestore, 'pendingLinks', inviterUid), {
     familyId,
-    partnerId: myUid,
-    partnerName: myName,
+    partnerId: acceptorUid,
+    partnerName: acceptorName,
+    linkedAt: new Date().toISOString(),
   });
 
   return familyId;
 }
 
+export async function applyPendingLink(uid) {
+  const snap = await getDoc(doc(firestore, 'pendingLinks', uid));
+  if (!snap.exists()) return null;
+
+  const { familyId, partnerId, partnerName } = snap.data();
+
+  await updateDoc(doc(firestore, 'users', uid), { familyId, partnerId, partnerName });
+  await deleteDoc(doc(firestore, 'pendingLinks', uid));
+
+  return { familyId, partnerId, partnerName };
+}
+
 export async function unlinkPartners(myUid, partnerUid, currentFamilyId) {
-  // Reset both users back to their own solo familyId
   await updateDoc(doc(firestore, 'users', myUid), {
     familyId: myUid,
     partnerId: null,
     partnerName: null,
   });
 
-  await updateDoc(doc(firestore, 'users', partnerUid), {
+  // Leave a pending unlink for the partner
+  await setDoc(doc(firestore, 'pendingLinks', partnerUid), {
     familyId: partnerUid,
     partnerId: null,
     partnerName: null,
+    linkedAt: new Date().toISOString(),
   });
 
-  // Remove the shared family document
   if (currentFamilyId) {
     await deleteDoc(doc(firestore, 'families', currentFamilyId));
   }

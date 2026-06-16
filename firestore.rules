@@ -18,16 +18,18 @@ service cloud.firestore {
       return getUserData().familyId == familyId;
     }
 
-    // User profiles — owner can fully update; any authenticated user can write
-    // only the partner-linking fields (needed when acceptor updates inviter's profile)
+    // User profiles — only the owner can read/write their own
     match /users/{uid} {
       allow read: if isAuthenticated() && (isOwner(uid) || getUserData().partnerId == uid);
       allow create: if isAuthenticated() && isOwner(uid);
-      allow update: if isAuthenticated() && (
-        isOwner(uid) ||
-        request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['familyId', 'partnerId', 'partnerName'])
-      );
+      allow update: if isAuthenticated() && isOwner(uid);
+    }
+
+    // Pending links — anyone authenticated can write (to leave a link for another user)
+    // but only the owner can read their own pending link
+    match /pendingLinks/{uid} {
+      allow read, delete: if isAuthenticated() && isOwner(uid);
+      allow write: if isAuthenticated();
     }
 
     // Families — readable by members

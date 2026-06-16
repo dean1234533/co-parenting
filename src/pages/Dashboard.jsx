@@ -1,4 +1,5 @@
 import db from '@/api/db';
+import { useAuth } from '@/lib/AuthContext';
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -14,15 +15,21 @@ import StatCard from "@/components/dashboard/StatCard";
 import { format } from "date-fns";
 
 export default function Dashboard() {
+  const { user } = useAuth();
+
   // Dashboard queries use no orderBy so Firestore only needs auto-created
   // single-field indexes — no manual composite index setup required.
   const byDateDesc = (a, b) => (b.created_date || '').localeCompare(a.created_date || '');
 
   const { data: messages = [] } = useQuery({
-    queryKey: ["messages"],
+    queryKey: ["messages", user?.id],
     queryFn: async () => {
       const all = await db.entities.ChatMessage.list();
-      return all.sort(byDateDesc).slice(0, 5);
+      // Show only messages received (not sent by the current user)
+      return all
+        .filter(m => m.created_by_id !== user?.id)
+        .sort(byDateDesc)
+        .slice(0, 5);
     },
   });
 
