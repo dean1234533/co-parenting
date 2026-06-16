@@ -14,7 +14,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const savedName = localStorage.getItem('coparent_name');
+  const savedName = localStorage.getItem('coparent_name')?.split(' ')[0];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
