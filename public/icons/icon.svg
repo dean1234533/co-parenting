@@ -2,24 +2,18 @@
   <!-- Background -->
   <rect width="512" height="512" rx="100" fill="#7c3aed"/>
 
-  <!-- Palm -->
-  <rect x="172" y="280" width="168" height="140" rx="40" fill="white"/>
+  <!-- Fist / closed hand body -->
+  <rect x="155" y="270" width="210" height="175" rx="50" fill="white"/>
 
-  <!-- Index finger (pointing up) -->
-  <rect x="222" y="110" width="68" height="200" rx="34" fill="white"/>
+  <!-- Index finger only pointing straight up -->
+  <rect x="210" y="95" width="75" height="205" rx="37" fill="white"/>
 
-  <!-- Middle finger (slightly lower) -->
-  <rect x="298" y="155" width="58" height="160" rx="29" fill="white"/>
+  <!-- Knuckle line across fist top -->
+  <rect x="155" y="268" width="210" height="30" rx="15" fill="white"/>
 
-  <!-- Ring finger -->
-  <rect x="362" y="195" width="50" height="130" rx="25" fill="white"/>
+  <!-- Thumb tucked to the left side -->
+  <path d="M155 310 Q108 295 105 340 Q103 375 145 385 L155 385 Z" fill="white"/>
 
-  <!-- Pinky -->
-  <rect x="416" y="230" width="42" height="105" rx="21" fill="white"/>
-
-  <!-- Thumb -->
-  <path d="M172 310 Q130 290 122 340 Q118 380 155 390 L172 390 Z" fill="white"/>
-
-  <!-- Upward arrow above finger tip -->
-  <path d="M256 70 L226 108 L246 108 L246 58 L266 58 L266 108 L286 108 Z" fill="white" opacity="0.5"/>
+  <!-- Small upward arrow tip above finger -->
+  <polygon points="247,58 222,95 272,95" fill="white" opacity="0.6"/>
 </svg>
