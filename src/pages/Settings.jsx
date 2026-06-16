@@ -23,6 +23,17 @@ export default function Settings() {
   const [gcalConnected, setGcalConnected] = useState(isConnected());
   const [gcalError, setGcalError] = useState('');
   const [gcalLoading, setGcalLoading] = useState(false);
+
+  // Re-check connection when user returns to this tab (OAuth popup closes)
+  React.useEffect(() => {
+    const check = () => setGcalConnected(isConnected());
+    window.addEventListener('focus', check);
+    document.addEventListener('visibilitychange', check);
+    return () => {
+      window.removeEventListener('focus', check);
+      document.removeEventListener('visibilitychange', check);
+    };
+  }, []);
   const [cleaningUp, setCleaningUp] = useState(false);
   const [cleanupResult, setCleanupResult] = useState(null); // null | number
   const [showCleanupConfirm, setShowCleanupConfirm] = useState(false);
