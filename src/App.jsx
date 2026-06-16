@@ -33,6 +33,7 @@ import Rules from "@/pages/Rules";
 import ExportPDF from "@/pages/ExportPDF";
 import DailyLog from "@/pages/DailyLog";
 import Children from "@/pages/Children";
+import Settings from "@/pages/Settings";
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, authChecked, isAuthenticated, profile } = useAuth();
@@ -71,6 +72,7 @@ const AuthenticatedApp = () => {
           <Route path="/daily-log" element={<DailyLog />} />
           <Route path="/children" element={<Children />} />
           <Route path="/export" element={<ExportPDF />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />

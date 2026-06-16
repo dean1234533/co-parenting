@@ -1,5 +1,5 @@
 import {
-  doc, getDoc, setDoc, updateDoc
+  doc, getDoc, setDoc, updateDoc, deleteDoc
 } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 import { auth, firestore } from '@/lib/firebase';
@@ -58,4 +58,24 @@ export async function linkPartners(myUid, partnerUid, myName, partnerName) {
   });
 
   return familyId;
+}
+
+export async function unlinkPartners(myUid, partnerUid, currentFamilyId) {
+  // Reset both users back to their own solo familyId
+  await updateDoc(doc(firestore, 'users', myUid), {
+    familyId: myUid,
+    partnerId: null,
+    partnerName: null,
+  });
+
+  await updateDoc(doc(firestore, 'users', partnerUid), {
+    familyId: partnerUid,
+    partnerId: null,
+    partnerName: null,
+  });
+
+  // Remove the shared family document
+  if (currentFamilyId) {
+    await deleteDoc(doc(firestore, 'families', currentFamilyId));
+  }
 }
