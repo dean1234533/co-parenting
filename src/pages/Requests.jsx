@@ -13,7 +13,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Check, X, Clock, AlertCircle, Plane, CalendarDays, MoreHorizontal } from "lucide-react";
+import { Plus, Check, X, Clock, AlertCircle, Plane, CalendarDays, MoreHorizontal, ShieldAlert } from "lucide-react";
+import { containsProfanity } from "@/lib/profanityFilter";
 import { format, differenceInHours, parseISO } from "date-fns";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -64,7 +65,22 @@ export default function Requests() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }) => db.entities.Request.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["requests"] }),
+    onSuccess: (_, { data }) => {
+      queryClient.invalidateQueries({ queryKey: ["requests"] });
+      if (data.status === "denied") {
+        sendPartnerNotification({
+          title: 'Request Denied',
+          body: `Your request was denied. Reason: ${data.response_note}`,
+          data: { type: 'request' },
+        });
+      } else if (data.status === "approved") {
+        sendPartnerNotification({
+          title: 'Request Approved',
+          body: `Your request has been approved`,
+          data: { type: 'request' },
+        });
+      }
+    },
   });
 
   const handleCreate = () => {
@@ -190,9 +206,28 @@ export default function Requests() {
 }
 
 function RequestCard({ request, onRespond, currentUser }) {
-  const [note, setNote] = useState("");
+  const [approveNote, setApproveNote] = useState("");
+  const [showDenyDialog, setShowDenyDialog] = useState(false);
+  const [denyReason, setDenyReason] = useState("");
+  const [denyError, setDenyError] = useState("");
   const Icon = typeIcons[request.type] || MoreHorizontal;
   const isOwn = request.created_by_id === currentUser?.id;
+
+  const handleDenySubmit = () => {
+    const trimmed = denyReason.trim();
+    if (trimmed.length < 20) {
+      setDenyError("Please provide a detailed reason (at least 20 characters).");
+      return;
+    }
+    if (containsProfanity(trimmed)) {
+      setDenyError("Your reason contains inappropriate language. Please keep it respectful.");
+      return;
+    }
+    onRespond(request.id, "denied", trimmed);
+    setShowDenyDialog(false);
+    setDenyReason("");
+    setDenyError("");
+  };
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
@@ -217,27 +252,43 @@ function RequestCard({ request, onRespond, currentUser }) {
                   {request.status}
                 </Badge>
               </div>
+
               {request.description && <p className="text-sm mt-2">{request.description}</p>}
+
               <div className="flex gap-4 mt-2 text-xs text-muted-foreground">
                 {request.date_from && <span>From: {format(new Date(request.date_from), "MMM d, yyyy")}</span>}
                 {request.date_to && <span>To: {format(new Date(request.date_to), "MMM d, yyyy")}</span>}
               </div>
-              {request.response_note && (
-                <p className="text-sm mt-2 p-2 bg-muted rounded-lg italic">"{request.response_note}"</p>
+
+              {/* Approval note */}
+              {request.status === "approved" && request.response_note && (
+                <p className="text-sm mt-2 p-2 bg-success/10 text-success rounded-lg italic">"{request.response_note}"</p>
               )}
+
+              {/* Denial reason — shown prominently to both parties */}
+              {request.status === "denied" && request.response_note && (
+                <div className="mt-3 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                  <p className="text-xs font-semibold text-destructive mb-1 flex items-center gap-1">
+                    <ShieldAlert className="h-3.5 w-3.5" /> Reason for denial
+                  </p>
+                  <p className="text-sm text-foreground">"{request.response_note}"</p>
+                </div>
+              )}
+
+              {/* Respond controls — only visible to the other person on pending requests */}
               {request.status === "pending" && !isOwn && onRespond && (
                 <div className="mt-3 space-y-2">
                   <Input
-                    value={note}
-                    onChange={(e) => setNote(e.target.value)}
-                    placeholder="Add a note (optional)..."
+                    value={approveNote}
+                    onChange={(e) => setApproveNote(e.target.value)}
+                    placeholder="Add a note when approving (optional)..."
                     className="text-sm"
                   />
                   <div className="flex gap-2">
-                    <Button size="sm" onClick={() => onRespond(request.id, "approved", note)} className="bg-success hover:bg-success/90">
+                    <Button size="sm" onClick={() => onRespond(request.id, "approved", approveNote)} className="bg-success hover:bg-success/90">
                       <Check className="h-3 w-3 mr-1" /> Approve
                     </Button>
-                    <Button size="sm" variant="destructive" onClick={() => onRespond(request.id, "denied", note)}>
+                    <Button size="sm" variant="destructive" onClick={() => setShowDenyDialog(true)}>
                       <X className="h-3 w-3 mr-1" /> Deny
                     </Button>
                   </div>
@@ -247,6 +298,48 @@ function RequestCard({ request, onRespond, currentUser }) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Deny reason dialog */}
+      <Dialog open={showDenyDialog} onOpenChange={setShowDenyDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-heading flex items-center gap-2">
+              <ShieldAlert className="h-5 w-5 text-destructive" /> Reason for Denial
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="p-3 bg-warning/10 border border-warning/20 rounded-lg text-sm text-warning-foreground">
+              <p className="font-semibold mb-1">Important</p>
+              <p>You may only deny this request if you have a <strong>valid reason</strong>. If your co-parent has followed the agreed co-parenting rules, you do not have the right to deny their request without justification.</p>
+            </div>
+            <div>
+              <Label>Your reason <span className="text-destructive">*</span></Label>
+              <Textarea
+                className="mt-1"
+                rows={4}
+                placeholder="Explain clearly why you are denying this request..."
+                value={denyReason}
+                onChange={(e) => { setDenyReason(e.target.value); setDenyError(""); }}
+              />
+              <p className="text-xs text-muted-foreground mt-1">{denyReason.trim().length} / 20 characters minimum</p>
+            </div>
+            {denyError && (
+              <div className="flex items-center gap-2 p-3 bg-destructive/10 text-destructive rounded-lg text-sm">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                {denyError}
+              </div>
+            )}
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1" onClick={() => { setShowDenyDialog(false); setDenyReason(""); setDenyError(""); }}>
+                Cancel
+              </Button>
+              <Button variant="destructive" className="flex-1" onClick={handleDenySubmit}>
+                Submit Denial
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </motion.div>
   );
 }
