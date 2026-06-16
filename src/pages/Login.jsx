@@ -32,7 +32,8 @@ export default function Login() {
   };
 
   const handleGoogle = () => {
-    db.auth.loginWithProvider("google", "/");
+    const next = new URLSearchParams(window.location.search).get('next');
+    db.auth.loginWithProvider("google", next || "/");
   };
 
   return (

@@ -34,9 +34,9 @@ service cloud.firestore {
       allow write: if isAuthenticated();
     }
 
-    // Invites — anyone authenticated can read (to accept), only creator can write
+    // Invites — anyone with the token URL can read (needed to show invite preview before login)
     match /invites/{token} {
-      allow read: if isAuthenticated();
+      allow read: if true;
       allow create: if isAuthenticated();
       allow update: if isAuthenticated();
     }

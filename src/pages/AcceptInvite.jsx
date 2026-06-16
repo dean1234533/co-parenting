@@ -17,12 +17,17 @@ export default function AcceptInvite() {
   const [error, setError] = useState('');
   const [done, setDone] = useState(false);
 
+  // Wait for auth to resolve before reading Firestore (rules require auth)
   useEffect(() => {
+    if (isLoadingAuth) return;
     getInvite(token)
-      .then(setInvite)
+      .then((inv) => {
+        if (!inv) setError('This invite link is invalid or has expired.');
+        else setInvite(inv);
+      })
       .catch(() => setError('This invite link is invalid or has expired.'))
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [token, isLoadingAuth]);
 
   const handleAccept = async () => {
     setAccepting(true);
