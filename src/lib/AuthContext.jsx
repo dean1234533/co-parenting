@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
 import { auth, firestore } from '@/lib/firebase';
 import { setFamilyId } from '@/api/db';
 import { applyPendingLink } from '@/lib/userProfile';
@@ -54,7 +54,11 @@ export const AuthProvider = ({ children }) => {
 
       // Apply any pending link left by a partner (avoids cross-user writes)
       if (!p.partnerId) {
-        applyPendingLink(firebaseUser.uid).catch(() => {});
+        applyPendingLink(firebaseUser.uid)
+          .then((link) => {
+            if (link) applyProfile(firebaseUser.uid, { ...snap.data(), ...link });
+          })
+          .catch(() => {});
       }
 
       if (firstSnapshot) {
@@ -98,7 +102,10 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const refreshProfile = async () => {
-    // No-op — profile auto-updates via onSnapshot
+    const user = auth.currentUser;
+    if (!user) return;
+    const snap = await getDoc(doc(firestore, 'users', user.uid));
+    if (snap.exists()) applyProfile(user.uid, snap.data());
   };
 
   const logout = async (shouldRedirect = true) => {

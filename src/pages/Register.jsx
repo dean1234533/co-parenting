@@ -37,7 +37,8 @@ export default function Register() {
           email,
         });
       }
-      window.location.href = '/';
+      const next = new URLSearchParams(window.location.search).get('next');
+      window.location.href = next || '/';
     } catch (err) {
       setError(err.message || "Registration failed");
     } finally {
