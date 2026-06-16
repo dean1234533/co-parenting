@@ -1,10 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
   <rect width="512" height="512" rx="96" fill="#7c3aed"/>
-  <!-- Heart shape -->
-  <path d="M256 380 C256 380 112 290 112 190 C112 148 146 116 186 116 C214 116 238 132 256 156 C274 132 298 116 326 116 C366 116 400 148 400 190 C400 290 256 380 256 380Z" fill="white"/>
-  <!-- Two small circles representing children/people -->
-  <circle cx="210" cy="210" r="22" fill="#7c3aed"/>
-  <circle cx="302" cy="210" r="22" fill="#7c3aed"/>
-  <!-- Smile arc -->
-  <path d="M210 245 Q256 275 302 245" stroke="#7c3aed" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <!-- Two figures (adults) -->
+  <circle cx="172" cy="168" r="38" fill="white"/>
+  <path d="M104 290 C104 254 136 228 172 228 C208 228 240 254 240 290 L240 320 L104 320 Z" fill="white"/>
+  <circle cx="340" cy="168" r="38" fill="white"/>
+  <path d="M272 290 C272 254 304 228 340 228 C376 228 408 254 408 290 L408 320 L272 320 Z" fill="white"/>
+  <!-- Child figure (smaller, centred below) -->
+  <circle cx="256" cy="340" r="28" fill="#c4b5fd"/>
+  <path d="M210 400 C210 374 231 354 256 354 C281 354 302 374 302 400 L302 420 L210 420 Z" fill="#c4b5fd"/>
+  <!-- Connecting arc above child -->
+  <path d="M172 310 Q256 350 340 310" stroke="white" stroke-width="8" fill="none" stroke-linecap="round"/>
 </svg>
