@@ -37,7 +37,7 @@ export default function Register() {
           email,
         });
       }
-      setShowOtp(true);
+      window.location.href = '/';
     } catch (err) {
       setError(err.message || "Registration failed");
     } finally {
