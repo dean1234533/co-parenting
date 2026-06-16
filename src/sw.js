@@ -75,7 +75,7 @@ const firebaseApp = initializeApp({
 const messaging = getMessaging(firebaseApp);
 
 onBackgroundMessage(messaging, (payload) => {
-  const title = payload.notification?.title || 'CoParent';
+  const title = payload.notification?.title || 'Js-Grw-Up';
   const body = payload.notification?.body || '';
   const icon = payload.notification?.icon || '/icons/icon.svg';
 

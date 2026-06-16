@@ -117,7 +117,7 @@ export async function onRequestPost(context) {
   } catch {
     return jsonRes({ error: 'Invalid request body' }, 400);
   }
-  const { title = 'CoParent', body: msgBody = '', data = {} } = body;
+  const { title = 'Js-Grw-Up', body: msgBody = '', data = {} } = body;
 
   // Verify Firebase ID token via accounts:lookup REST endpoint
   const lookupRes = await fetch(

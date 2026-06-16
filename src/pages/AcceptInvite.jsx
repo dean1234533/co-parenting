@@ -57,7 +57,7 @@ export default function AcceptInvite() {
     return (
       <AuthLayout icon={CheckCircle} title="You're linked!" subtitle="Redirecting you to the app…">
         <div className="text-center text-muted-foreground text-sm">
-          You and <strong>{invite?.createdByName}</strong> are now co-parenting together on CoParent.
+          You and <strong>{invite?.createdByName}</strong> are now co-parenting together on Js-Grw-Up.
         </div>
       </AuthLayout>
     );

@@ -74,7 +74,7 @@ export default function InstallPrompt() {
                 <Smartphone className="h-6 w-6 text-primary-foreground" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-foreground leading-tight">Install CoParent App</p>
+                <p className="font-semibold text-foreground leading-tight">Install Js-Grw-Up</p>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {ios
                     ? 'Add to your Home Screen for the full experience'

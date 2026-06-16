@@ -22,7 +22,7 @@ export default function Privacy() {
             <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
               <Heart className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="font-heading font-bold">CoParent</span>
+            <span className="font-heading font-bold">Js-Grw-Up</span>
           </div>
         </div>
       </div>
@@ -32,8 +32,8 @@ export default function Privacy() {
         <p className="text-muted-foreground mb-10">Last updated: June 2026</p>
 
         <Section title="1. Introduction">
-          <p>CoParent ("we", "us", "our") is committed to protecting your personal information. This Privacy Policy explains what data we collect, how we use it, and your rights regarding that data.</p>
-          <p>By using CoParent you agree to the collection and use of information as described in this policy.</p>
+          <p>Js-Grw-Up ("we", "us", "our") is committed to protecting your personal information. This Privacy Policy explains what data we collect, how we use it, and your rights regarding that data.</p>
+          <p>By using Js-Grw-Up you agree to the collection and use of information as described in this policy.</p>
         </Section>
 
         <Section title="2. Information We Collect">
@@ -46,7 +46,7 @@ export default function Privacy() {
 
         <Section title="3. How We Use Your Information">
           <ul className="list-disc pl-6 space-y-1">
-            <li>To provide and operate the CoParent service</li>
+            <li>To provide and operate the Js-Grw-Up service</li>
             <li>To share data between linked co-parent accounts</li>
             <li>To send push notifications when your co-parent sends a message or request</li>
             <li>To enforce our Terms and Conditions, including the profanity filter</li>
@@ -73,11 +73,11 @@ export default function Privacy() {
         </Section>
 
         <Section title="7. Push Notifications">
-          <p>If you grant notification permission, we store a push notification token on your device and in our database. This token is used solely to deliver notifications from your linked co-parent's activity. You can revoke notification permission at any time from your device settings or from within the CoParent app sidebar.</p>
+          <p>If you grant notification permission, we store a push notification token on your device and in our database. This token is used solely to deliver notifications from your linked co-parent's activity. You can revoke notification permission at any time from your device settings or from within the Js-Grw-Up app sidebar.</p>
         </Section>
 
         <Section title="8. Children's Privacy">
-          <p>CoParent is intended for adults (18+) only. We do not knowingly collect data from children. If you believe a child has created an account, please contact us so we can delete it.</p>
+          <p>Js-Grw-Up is intended for adults (18+) only. We do not knowingly collect data from children. If you believe a child has created an account, please contact us so we can delete it.</p>
         </Section>
 
         <Section title="9. Your Rights">
@@ -93,7 +93,7 @@ export default function Privacy() {
         </Section>
 
         <Section title="10. Cookies and Local Storage">
-          <p>CoParent uses browser local storage to remember your name for the login greeting and to maintain your authentication session. We do not use advertising cookies or tracking cookies.</p>
+          <p>Js-Grw-Up uses browser local storage to remember your name for the login greeting and to maintain your authentication session. We do not use advertising cookies or tracking cookies.</p>
         </Section>
 
         <Section title="11. Changes to This Policy">

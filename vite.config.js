@@ -13,8 +13,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
       manifest: {
-        name: 'CoParent App',
-        short_name: 'CoParent',
+        name: 'Js-Grw-Up',
+        short_name: 'Js-Grw-Up',
         description: 'Co-parenting communication and coordination — together for the kids.',
         theme_color: '#000000',
         background_color: '#000000',

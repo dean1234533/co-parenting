@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import { format } from 'date-fns';
 
 /**
- * Generates and downloads a full CoParent PDF report.
+ * Generates and downloads a full Js-Grw-Up PDF report.
  * @param {object} data  — { messages, requests, incidents, progress, expenses, events, rules }
  * @param {string} filename
  */
@@ -51,7 +51,7 @@ export function generateAndDownloadPDF(data, filename = 'coparent-report.pdf') {
   // Cover
   doc.setFontSize(22);
   doc.setFont(undefined, 'bold');
-  doc.text('CoParent — Full Report', margin, y);
+  doc.text('Js-Grw-Up — Full Report', margin, y);
   y += 8;
   doc.setFontSize(9);
   doc.setFont(undefined, 'normal');

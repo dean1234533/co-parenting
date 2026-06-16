@@ -22,7 +22,7 @@ export default function Terms() {
             <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
               <Heart className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="font-heading font-bold">CoParent</span>
+            <span className="font-heading font-bold">Js-Grw-Up</span>
           </div>
         </div>
       </div>
@@ -32,26 +32,26 @@ export default function Terms() {
         <p className="text-muted-foreground mb-10">Last updated: June 2026</p>
 
         <Section title="1. Acceptance of Terms">
-          <p>By creating an account or using the CoParent app, you agree to be bound by these Terms and Conditions. If you do not agree, please do not use the app.</p>
-          <p>These terms apply to all users of CoParent, including co-parents who have linked their accounts and any other users who access the service.</p>
+          <p>By creating an account or using the Js-Grw-Up app, you agree to be bound by these Terms and Conditions. If you do not agree, please do not use the app.</p>
+          <p>These terms apply to all users of Js-Grw-Up, including co-parents who have linked their accounts and any other users who access the service.</p>
         </Section>
 
         <Section title="2. Description of Service">
-          <p>CoParent is a private communication and coordination platform designed to help separated or divorced parents manage co-parenting responsibilities. The app provides messaging, calendar sharing, expense tracking, incident reporting, and other tools.</p>
-          <p>CoParent is not a legal service and does not provide legal advice. Nothing in the app constitutes legal documentation unless exported and verified by a qualified legal professional.</p>
+          <p>Js-Grw-Up is a private communication and coordination platform designed to help separated or divorced parents manage co-parenting responsibilities. The app provides messaging, calendar sharing, expense tracking, incident reporting, and other tools.</p>
+          <p>Js-Grw-Up is not a legal service and does not provide legal advice. Nothing in the app constitutes legal documentation unless exported and verified by a qualified legal professional.</p>
         </Section>
 
         <Section title="3. Eligibility">
-          <p>You must be at least 18 years old to use CoParent. By registering, you confirm that you are 18 or older and have the legal capacity to enter into these terms.</p>
+          <p>You must be at least 18 years old to use Js-Grw-Up. By registering, you confirm that you are 18 or older and have the legal capacity to enter into these terms.</p>
         </Section>
 
         <Section title="4. Account Responsibility">
           <p>You are responsible for maintaining the confidentiality of your account credentials. You are responsible for all activity that occurs under your account.</p>
-          <p>You agree to notify us immediately of any unauthorised use of your account. CoParent is not liable for any loss resulting from unauthorised use of your account.</p>
+          <p>You agree to notify us immediately of any unauthorised use of your account. Js-Grw-Up is not liable for any loss resulting from unauthorised use of your account.</p>
         </Section>
 
         <Section title="5. Acceptable Use">
-          <p>You agree to use CoParent only for lawful co-parenting communication and coordination. You must not use the app to:</p>
+          <p>You agree to use Js-Grw-Up only for lawful co-parenting communication and coordination. You must not use the app to:</p>
           <ul className="list-disc pl-6 space-y-1">
             <li>Harass, threaten, or abuse the other parent or any third party</li>
             <li>Send obscene, offensive, or inappropriate content</li>
@@ -60,7 +60,7 @@ export default function Terms() {
             <li>Use the service for any illegal purpose</li>
             <li>Violate any applicable local, national, or international law</li>
           </ul>
-          <p>CoParent uses an automated profanity and abuse filter. Messages that violate these standards will be blocked. Repeated violations may result in account suspension.</p>
+          <p>Js-Grw-Up uses an automated profanity and abuse filter. Messages that violate these standards will be blocked. Repeated violations may result in account suspension.</p>
         </Section>
 
         <Section title="6. Partner Linking">
@@ -69,12 +69,12 @@ export default function Terms() {
         </Section>
 
         <Section title="7. Content">
-          <p>You retain ownership of any content you create within CoParent. By using the app, you grant CoParent a limited licence to store and display that content to you and your linked co-parent as necessary to provide the service.</p>
-          <p>You are solely responsible for the accuracy and legality of content you post. CoParent does not verify the accuracy of user-submitted information.</p>
+          <p>You retain ownership of any content you create within Js-Grw-Up. By using the app, you grant Js-Grw-Up a limited licence to store and display that content to you and your linked co-parent as necessary to provide the service.</p>
+          <p>You are solely responsible for the accuracy and legality of content you post. Js-Grw-Up does not verify the accuracy of user-submitted information.</p>
         </Section>
 
         <Section title="8. Data and Privacy">
-          <p>Your use of CoParent is also governed by our <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>, which is incorporated into these Terms by reference.</p>
+          <p>Your use of Js-Grw-Up is also governed by our <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>, which is incorporated into these Terms by reference.</p>
         </Section>
 
         <Section title="9. Account Deletion">
@@ -82,12 +82,12 @@ export default function Terms() {
         </Section>
 
         <Section title="10. Disclaimers">
-          <p>CoParent is provided "as is" without warranties of any kind. We do not guarantee that the service will be uninterrupted, error-free, or that data will never be lost.</p>
-          <p>CoParent is not a substitute for legal advice, mediation, or court-ordered parenting plans. Always consult a qualified legal professional for matters involving custody or parental rights.</p>
+          <p>Js-Grw-Up is provided "as is" without warranties of any kind. We do not guarantee that the service will be uninterrupted, error-free, or that data will never be lost.</p>
+          <p>Js-Grw-Up is not a substitute for legal advice, mediation, or court-ordered parenting plans. Always consult a qualified legal professional for matters involving custody or parental rights.</p>
         </Section>
 
         <Section title="11. Limitation of Liability">
-          <p>To the fullest extent permitted by law, CoParent and its operators shall not be liable for any indirect, incidental, or consequential damages arising from your use of the app, including loss of data, relationship disputes, or legal proceedings.</p>
+          <p>To the fullest extent permitted by law, Js-Grw-Up and its operators shall not be liable for any indirect, incidental, or consequential damages arising from your use of the app, including loss of data, relationship disputes, or legal proceedings.</p>
         </Section>
 
         <Section title="12. Changes to Terms">

@@ -101,7 +101,7 @@ export async function sendToGoogleCalendar(event) {
     event.child_name   ? `Child: ${event.child_name}`   : '',
     event.added_by     ? `Added by: ${event.added_by}`  : '',
     event.event_type   ? `Type: ${event.event_type}`    : '',
-    'Created via CoParent app',
+    'Created via Js-Grw-Up app',
   ].filter(Boolean);
 
   const body = {

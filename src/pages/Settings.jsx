@@ -138,7 +138,7 @@ export default function Settings() {
           </CardHeader>
           <CardContent className="space-y-3">
             <p className="text-xs text-muted-foreground">
-              Connect your Google Calendar so you can send CoParent events to it with one tap from the Calendar page.
+              Connect your Google Calendar so you can send Js-Grw-Up events to it with one tap from the Calendar page.
             </p>
             {gcalConnected ? (
               <div className="flex items-center justify-between">

@@ -12,7 +12,7 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
             <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center shadow-lg">
               <Heart className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-2xl font-heading font-bold text-foreground">CoParent</span>
+            <span className="text-2xl font-heading font-bold text-foreground">Js-Grw-Up</span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight text-foreground">{title}</h1>
           {subtitle && <p className="text-muted-foreground mt-2">{subtitle}</p>}

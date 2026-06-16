@@ -88,7 +88,7 @@ export default function Sidebar() {
               <Heart className="h-5 w-5 text-primary-foreground" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-lg font-heading font-bold text-sidebar-foreground">CoParent</h1>
+              <h1 className="text-lg font-heading font-bold text-sidebar-foreground">Js-Grw-Up</h1>
               {profile?.displayName && (
                 <p className="text-xs text-sidebar-foreground/60 truncate">
                   {profile.displayName}

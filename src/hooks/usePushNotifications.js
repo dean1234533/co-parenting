@@ -83,7 +83,7 @@ export function usePushNotifications() {
         setForegroundMessage(payload);
         // Show a browser notification even in foreground
         if (Notification.permission === 'granted') {
-          new Notification(payload.notification?.title || 'CoParent', {
+          new Notification(payload.notification?.title || 'Js-Grw-Up', {
             body: payload.notification?.body || '',
             icon: '/icons/icon.svg',
           });
