@@ -35,7 +35,7 @@ export default function Login() {
   return (
     <AuthLayout
       icon={LogIn}
-      title={accountDeleted ? "Account deleted" : savedName ? `Welcome back, ${savedName}` : "Welcome back"}
+      title={accountDeleted ? "Account deleted" : savedName ? `Welcome back, ${savedName}` : "Log in"}
       subtitle={accountDeleted ? "Your account has been permanently deleted." : "Log in to your account"}
       footer={
         <>
