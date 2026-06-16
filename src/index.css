@@ -93,12 +93,18 @@
   * {
     @apply border-border outline-ring/50;
     box-sizing: border-box;
+    /* Prevent text from overflowing its container on mobile */
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
   }
 
   html {
     overflow-x: hidden;
     overscroll-behavior: none;
     height: 100%;
+    /* Fluid base font — scales smoothly from 14px (320px screen) to 16px (1280px+) */
+    font-size: clamp(14px, 1vw + 12px, 16px);
   }
 
   body {
@@ -106,13 +112,26 @@
     overflow-x: hidden;
     overscroll-behavior: none;
     min-height: 100dvh;
-    min-height: 100vh; /* fallback */
-    /* Respect iPhone notch / home bar */
+    min-height: 100vh;
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
     position: relative;
     width: 100%;
+  }
+
+  /* Page headings: large on desktop, sensible on mobile */
+  h1.text-3xl { font-size: clamp(1.4rem, 5vw, 1.875rem); }
+  h1.text-4xl { font-size: clamp(1.6rem, 6vw, 2.25rem); }
+
+  /* Inputs stay 16px to prevent iOS auto-zoom */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Cards and containers should never exceed their parent */
+  .card, [class*="Card"] {
+    max-width: 100%;
   }
 }
