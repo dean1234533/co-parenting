@@ -221,13 +221,13 @@ export default function Settings() {
 
           <Button
             variant="outline"
-            className="w-full gap-2"
+            className="w-full gap-2 h-auto py-3 whitespace-normal text-center"
             onClick={() => setShowCleanupConfirm(true)}
             disabled={cleaningUp}
           >
             {cleaningUp
-              ? <><Loader2 className="h-4 w-4 animate-spin" /> Working…</>
-              : <><Archive className="h-4 w-4" /> Download PDF Archive &amp; Delete Records &gt;12 Months</>
+              ? <><Loader2 className="h-4 w-4 animate-spin shrink-0" /> Working…</>
+              : <><Archive className="h-4 w-4 shrink-0" /> Download PDF Archive &amp; Delete Old Records</>
             }
           </Button>
         </CardContent>
