@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { auth, firestore } from '@/lib/firebase';
-import { deleteUser } from 'firebase/auth';
-import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
+import { doc, deleteDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -87,29 +86,35 @@ export default function Settings() {
     try {
       const user = auth.currentUser;
 
-      // If linked, clear partner's reference first
+      // If linked, leave a pendingLink for the partner so they get unlinked on next load.
+      // We write to pendingLinks (which any authenticated user can write to) rather than
+      // the partner's /users doc (which we can't write to under Firestore rules).
       if (profile?.partnerId) {
-        await updateDoc(doc(firestore, 'users', profile.partnerId), {
+        await setDoc(doc(firestore, 'pendingLinks', profile.partnerId), {
           familyId: profile.partnerId,
           partnerId: null,
           partnerName: null,
+          linkedAt: new Date().toISOString(),
         });
       }
 
-      // Delete Firestore profile
-      await deleteDoc(doc(firestore, 'users', user.uid));
+      // Call the Cloudflare function which uses the service account to delete the
+      // Firebase Auth user — this bypasses the client-side "requires-recent-login" error.
+      const idToken = await user.getIdToken();
+      const res = await fetch('/api/delete-account', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
 
-      // Delete Firebase Auth account
-      await deleteUser(user);
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Server error ${res.status}`);
+      }
 
       window.location.href = '/login';
     } catch (err) {
       console.error('Delete account error:', err);
-      if (err.code === 'auth/requires-recent-login') {
-        setError('Please sign out and sign back in, then try again.');
-      } else {
-        setError('Failed to delete account. Please try again.');
-      }
+      setError(err.message || 'Failed to delete account. Please try again.');
     } finally {
       setDeleting(false);
     }
