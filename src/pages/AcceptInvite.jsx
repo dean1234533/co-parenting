@@ -38,7 +38,8 @@ export default function AcceptInvite() {
       setDone(true);
       setTimeout(() => navigate('/'), 2000);
     } catch (err) {
-      setError(err.message || 'Failed to accept invite');
+      console.error('acceptInvite error:', err);
+      setError(err.message || 'Failed to accept invite. Please try again.');
     } finally {
       setAccepting(false);
     }
