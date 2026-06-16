@@ -6,12 +6,12 @@ import RetentionNotice from "@/components/RetentionNotice";
 
 export default function AppLayout() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen min-h-dvh bg-background overflow-x-hidden">
       <Sidebar />
       <NotificationBanner />
       <RetentionNotice />
-      <main className="lg:ml-72 min-h-screen">
-        <div className="p-4 pt-16 lg:p-8 lg:pt-8 max-w-7xl mx-auto">
+      <main className="lg:ml-72 min-h-screen min-h-dvh overflow-x-hidden">
+        <div className="p-4 pt-16 lg:p-8 lg:pt-8 max-w-7xl mx-auto w-full">
           <Outlet />
         </div>
       </main>
