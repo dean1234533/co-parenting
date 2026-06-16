@@ -14,7 +14,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const savedName = localStorage.getItem('coparent_name')?.split(' ')[0];
+  const accountDeleted = new URLSearchParams(window.location.search).get('deleted') === 'true';
+  const savedName = !accountDeleted && localStorage.getItem('coparent_name')?.split(' ')[0];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,8 +35,8 @@ export default function Login() {
   return (
     <AuthLayout
       icon={LogIn}
-      title={savedName ? `Welcome back, ${savedName}` : "Welcome back"}
-      subtitle="Log in to your account"
+      title={accountDeleted ? "Account deleted" : savedName ? `Welcome back, ${savedName}` : "Welcome back"}
+      subtitle={accountDeleted ? "Your account has been permanently deleted." : "Log in to your account"}
       footer={
         <>
           Don't have an account?{" "}
@@ -45,6 +46,11 @@ export default function Login() {
         </>
       }
     >
+      {accountDeleted && (
+        <div className="mb-4 p-3 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-sm">
+          Your account and all associated data have been permanently deleted.
+        </div>
+      )}
       {error && (
         <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
           {error}

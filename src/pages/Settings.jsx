@@ -71,9 +71,10 @@ export default function Settings() {
         throw new Error(body.error || `Server error ${res.status}`);
       }
 
-      // Whether or not the Auth record was removed, the Firestore data is gone.
-      // Sign out locally so the user is fully logged out.
-      window.location.href = '/login';
+      // Clear any locally cached identity so the login page doesn't say "Welcome back"
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.href = '/login?deleted=true';
     } catch (err) {
       console.error('Delete account error:', err);
       setError(err.message || 'Failed to delete account. Please try again.');
