@@ -12,6 +12,7 @@ import AuthLayout from "@/components/AuthLayout";
 import { toast } from "@/components/ui/use-toast";
 
 export default function Register() {
+  const accountDeleted = new URLSearchParams(window.location.search).get('deleted') === 'true';
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -102,6 +103,11 @@ export default function Register() {
         </>
       }
     >
+      {accountDeleted && (
+        <div className="mb-4 p-3 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-sm">
+          Your account has been deleted. Create a new one below if you'd like to start fresh.
+        </div>
+      )}
       {error && (
         <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
           {error}

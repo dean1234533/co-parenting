@@ -74,7 +74,7 @@ export default function Settings() {
       // Clear any locally cached identity so the login page doesn't say "Welcome back"
       localStorage.clear();
       sessionStorage.clear();
-      window.location.href = '/login?deleted=true';
+      window.location.href = '/register?deleted=true';
     } catch (err) {
       console.error('Delete account error:', err);
       setError(err.message || 'Failed to delete account. Please try again.');
