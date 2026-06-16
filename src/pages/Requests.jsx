@@ -70,7 +70,7 @@ export default function Requests() {
       if (data.status === "denied") {
         sendPartnerNotification({
           title: 'Request Denied',
-          body: `Your request was denied. Reason: ${data.response_note}`,
+          body: `Your request was denied. Reason: ${data.response_note}. Check the Denied tab for details.`,
           data: { type: 'request' },
         });
       } else if (data.status === "approved") {
@@ -105,7 +105,8 @@ export default function Requests() {
   };
 
   const pendingRequests = requests.filter((r) => r.status === "pending");
-  const resolvedRequests = requests.filter((r) => r.status !== "pending");
+  const deniedRequests = requests.filter((r) => r.status === "denied");
+  const approvedRequests = requests.filter((r) => r.status === "approved");
 
   return (
     <div className="space-y-6">
@@ -172,7 +173,10 @@ export default function Requests() {
           <TabsTrigger value="pending">
             Pending {pendingRequests.length > 0 && <Badge className="ml-2 bg-warning text-warning-foreground h-5 w-5 p-0 flex items-center justify-center rounded-full text-xs">{pendingRequests.length}</Badge>}
           </TabsTrigger>
-          <TabsTrigger value="resolved">History</TabsTrigger>
+          <TabsTrigger value="denied">
+            Denied {deniedRequests.length > 0 && <Badge className="ml-2 bg-destructive text-destructive-foreground h-5 w-5 p-0 flex items-center justify-center rounded-full text-xs">{deniedRequests.length}</Badge>}
+          </TabsTrigger>
+          <TabsTrigger value="history">History</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pending" className="mt-4">
@@ -189,12 +193,30 @@ export default function Requests() {
           </div>
         </TabsContent>
 
-        <TabsContent value="resolved" className="mt-4">
+        <TabsContent value="denied" className="mt-4">
           <div className="space-y-3">
-            {resolvedRequests.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">No resolved requests</p>
+            {deniedRequests.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">No denied requests</p>
             ) : (
-              resolvedRequests.map((req) => (
+              <>
+                <div className="flex items-start gap-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg text-sm text-destructive">
+                  <ShieldAlert className="h-4 w-4 shrink-0 mt-0.5" />
+                  <p>These requests were denied. The reason for each denial is shown below. A denial is only valid if there is a genuine reason — if your co-parent has followed the agreed rules, the request should have been approved.</p>
+                </div>
+                {deniedRequests.map((req) => (
+                  <RequestCard key={req.id} request={req} currentUser={currentUser} />
+                ))}
+              </>
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="history" className="mt-4">
+          <div className="space-y-3">
+            {approvedRequests.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">No approved requests</p>
+            ) : (
+              approvedRequests.map((req) => (
                 <RequestCard key={req.id} request={req} currentUser={currentUser} />
               ))
             )}
