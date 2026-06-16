@@ -2,18 +2,15 @@
   <!-- Background -->
   <rect width="512" height="512" rx="100" fill="#7c3aed"/>
 
-  <!-- Palm / fist base -->
-  <rect x="148" y="295" width="216" height="160" rx="50" fill="white"/>
+  <!-- Peace symbol circle (ring) -->
+  <circle cx="256" cy="240" r="160" fill="none" stroke="white" stroke-width="36"/>
 
-  <!-- Index finger (left, angled slightly left) -->
-  <rect x="172" y="95" width="72" height="225" rx="36" fill="white" transform="rotate(-8 208 210)"/>
+  <!-- Vertical line (top to bottom through circle) -->
+  <line x1="256" y1="80" x2="256" y2="400" stroke="white" stroke-width="36" stroke-linecap="round"/>
 
-  <!-- Middle finger (right, angled slightly right) -->
-  <rect x="268" y="95" width="72" height="225" rx="36" fill="white" transform="rotate(8 304 210)"/>
+  <!-- Bottom left diagonal -->
+  <line x1="256" y1="400" x2="143" y2="307" stroke="white" stroke-width="36" stroke-linecap="round"/>
 
-  <!-- Thumb tucked left -->
-  <path d="M148 320 Q100 300 97 348 Q95 385 138 393 L148 393 Z" fill="white"/>
-
-  <!-- Knuckle bridge connecting fingers to palm -->
-  <rect x="148" y="293" width="216" height="35" rx="17" fill="white"/>
+  <!-- Bottom right diagonal -->
+  <line x1="256" y1="400" x2="369" y2="307" stroke="white" stroke-width="36" stroke-linecap="round"/>
 </svg>
