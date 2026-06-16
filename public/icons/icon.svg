@@ -2,18 +2,18 @@
   <!-- Background -->
   <rect width="512" height="512" rx="100" fill="#7c3aed"/>
 
-  <!-- Fist / closed hand body -->
-  <rect x="155" y="270" width="210" height="175" rx="50" fill="white"/>
+  <!-- Palm / fist base -->
+  <rect x="148" y="295" width="216" height="160" rx="50" fill="white"/>
 
-  <!-- Index finger only pointing straight up -->
-  <rect x="210" y="95" width="75" height="205" rx="37" fill="white"/>
+  <!-- Index finger (left, angled slightly left) -->
+  <rect x="172" y="95" width="72" height="225" rx="36" fill="white" transform="rotate(-8 208 210)"/>
 
-  <!-- Knuckle line across fist top -->
-  <rect x="155" y="268" width="210" height="30" rx="15" fill="white"/>
+  <!-- Middle finger (right, angled slightly right) -->
+  <rect x="268" y="95" width="72" height="225" rx="36" fill="white" transform="rotate(8 304 210)"/>
 
-  <!-- Thumb tucked to the left side -->
-  <path d="M155 310 Q108 295 105 340 Q103 375 145 385 L155 385 Z" fill="white"/>
+  <!-- Thumb tucked left -->
+  <path d="M148 320 Q100 300 97 348 Q95 385 138 393 L148 393 Z" fill="white"/>
 
-  <!-- Small upward arrow tip above finger -->
-  <polygon points="247,58 222,95 272,95" fill="white" opacity="0.6"/>
+  <!-- Knuckle bridge connecting fingers to palm -->
+  <rect x="148" y="293" width="216" height="35" rx="17" fill="white"/>
 </svg>
