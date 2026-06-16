@@ -1,5 +1,6 @@
 import db from '@/api/db';
 import { useAuth } from '@/lib/AuthContext';
+import EmergencyContact from '@/components/EmergencyContact';
 
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -96,6 +97,9 @@ export default function Dashboard() {
           subtitle="On the calendar"
         />
       </div>
+
+      {/* Emergency contact */}
+      <EmergencyContact />
 
       {/* Quick Access Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -18,9 +18,15 @@ export async function createInvite() {
   const token = generateToken();
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // 7 days
 
+  // Extract first name only; strip email domain if displayName was accidentally set to an email
+  const rawName = profile.displayName || '';
+  const firstName = rawName.includes('@')
+    ? rawName.split('@')[0]
+    : rawName.split(' ')[0];
+
   await setDoc(doc(firestore, 'invites', token), {
     createdBy: user.uid,
-    createdByName: profile.displayName || 'Your co-parent',
+    createdByName: firstName || 'Your co-parent',
     status: 'pending',
     expiresAt,
     createdAt: new Date().toISOString(),

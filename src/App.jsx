@@ -47,8 +47,9 @@ const AuthenticatedApp = () => {
     );
   }
 
-  // Show name setup if logged in but no proper displayName set
-  if (isAuthenticated && profile && !profile.displayName) {
+  // Show name setup if logged in but no proper displayName set, or if it looks like an email
+  const nameNeedsSetup = !profile?.displayName || profile.displayName.includes('@');
+  if (isAuthenticated && profile && nameNeedsSetup) {
     return <ProfileSetup />;
   }
 

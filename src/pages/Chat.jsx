@@ -2,7 +2,7 @@ import db from '@/api/db';
 import { sendPartnerNotification } from '@/lib/notify';
 
 import React, { useState, useRef, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { firestore } from '@/lib/firebase';
 import { useAuth } from '@/lib/AuthContext';
@@ -23,11 +23,6 @@ export default function Chat() {
   const [loadingMessages, setLoadingMessages] = useState(true);
   const messagesEndRef = useRef(null);
   const { profile, user } = useAuth();
-
-  const { data: currentUser } = useQuery({
-    queryKey: ["me"],
-    queryFn: () => db.auth.me(),
-  });
 
   // Real-time Firestore listener — no polling
   useEffect(() => {
@@ -66,9 +61,10 @@ export default function Chat() {
     onSuccess: (_, variables) => {
       setMessage("");
       setWarning("");
+      const senderName = profile?.displayName || variables.sender_name || 'Your co-parent';
       sendPartnerNotification({
-        title: variables.sender_name || 'CoParent',
-        body: `${variables.sender_name || 'Your co-parent'} sent you a message`,
+        title: senderName,
+        body: `${senderName} sent you a message`,
         data: { type: 'chat' },
       });
     },
@@ -89,7 +85,7 @@ export default function Chat() {
 
     sendMutation.mutate({
       content: message.trim(),
-      sender_name: currentUser?.full_name || "Unknown",
+      sender_name: profile?.displayName || "Unknown",
     });
   };
 
@@ -138,7 +134,7 @@ export default function Chat() {
           ) : (
             <AnimatePresence initial={false}>
               {messages.map((msg) => {
-                const isMe = msg.created_by_id === currentUser?.id;
+                const isMe = msg.created_by_id === user?.id;
                 return (
                   <motion.div
                     key={msg.id}

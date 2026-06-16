@@ -1,4 +1,5 @@
 import db from '@/api/db';
+import { sendToGoogleCalendar } from '@/lib/googleCalendar';
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Plus, ChevronLeft, ChevronRight, CalendarDays } from "lucide-react";
+import { Plus, ChevronLeft, ChevronRight, Check, Loader2, AlertCircle } from "lucide-react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isSameDay, addMonths, subMonths } from "date-fns";
 import { motion } from "framer-motion";
 
@@ -26,11 +27,26 @@ const eventTypeColors = {
   other: "bg-muted-foreground text-white",
 };
 
+// Google Calendar logo mark (SVG) — used as a small icon button
+function GCalIcon({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+      <rect x="6" y="6" width="36" height="36" rx="4" fill="#fff" stroke="#dadce0" strokeWidth="2"/>
+      <path d="M6 18h36v4H6z" fill="#4285F4"/>
+      <text x="24" y="36" textAnchor="middle" fontSize="16" fontWeight="bold" fill="#4285F4">
+        {new Date().getDate()}
+      </text>
+    </svg>
+  );
+}
+
 export default function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ title: "", description: "", date: "", time: "", event_type: "", child_name: "" });
+  // Track per-event Google Calendar send state: { [eventId]: 'idle'|'loading'|'done'|'error' }
+  const [gcalState, setGcalState] = useState({});
   const queryClient = useQueryClient();
 
   const { data: currentUser } = useQuery({
@@ -57,6 +73,20 @@ export default function CalendarPage() {
       ...form,
       added_by: currentUser?.full_name || "Unknown",
     });
+  };
+
+  const handleSendToGCal = async (evt) => {
+    setGcalState((s) => ({ ...s, [evt.id]: 'loading' }));
+    try {
+      await sendToGoogleCalendar(evt);
+      setGcalState((s) => ({ ...s, [evt.id]: 'done' }));
+      // Reset back to idle after 3 seconds
+      setTimeout(() => setGcalState((s) => ({ ...s, [evt.id]: 'idle' })), 3000);
+    } catch (err) {
+      console.error('Google Calendar error:', err);
+      setGcalState((s) => ({ ...s, [evt.id]: 'error' }));
+      setTimeout(() => setGcalState((s) => ({ ...s, [evt.id]: 'idle' })), 4000);
+    }
   };
 
   const monthStart = startOfMonth(currentMonth);
@@ -196,22 +226,52 @@ export default function CalendarPage() {
               <p className="text-muted-foreground text-sm text-center py-4">No events on this day</p>
             ) : (
               <div className="space-y-3">
-                {selectedEvents.map((evt) => (
-                  <motion.div key={evt.id} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}>
-                    <div className="p-3 bg-muted/50 rounded-lg">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Badge className={eventTypeColors[evt.event_type]} variant="secondary">
-                          {evt.event_type}
-                        </Badge>
-                        {evt.time && <span className="text-xs text-muted-foreground">{evt.time}</span>}
+                {selectedEvents.map((evt) => {
+                  const gcState = gcalState[evt.id] || 'idle';
+                  return (
+                    <motion.div key={evt.id} initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }}>
+                      <div className="p-3 bg-muted/50 rounded-lg">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Badge className={eventTypeColors[evt.event_type]} variant="secondary">
+                                {evt.event_type}
+                              </Badge>
+                              {evt.time && <span className="text-xs text-muted-foreground">{evt.time}</span>}
+                            </div>
+                            <h4 className="font-semibold text-sm">{evt.title}</h4>
+                            {evt.child_name && <p className="text-xs text-muted-foreground mt-0.5">{evt.child_name}</p>}
+                            {evt.description && <p className="text-xs mt-1">{evt.description}</p>}
+                            <p className="text-xs text-muted-foreground mt-1">Added by {evt.added_by}</p>
+                          </div>
+
+                          {/* Send to Google Calendar button */}
+                          {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+                            <button
+                              onClick={() => handleSendToGCal(evt)}
+                              disabled={gcState === 'loading' || gcState === 'done'}
+                              title={
+                                gcState === 'done'  ? 'Added to Google Calendar' :
+                                gcState === 'error' ? 'Failed — tap to retry' :
+                                'Add to Google Calendar'
+                              }
+                              className="shrink-0 mt-0.5 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted transition-colors disabled:opacity-60"
+                            >
+                              {gcState === 'loading' && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
+                              {gcState === 'done'    && <Check className="w-4 h-4 text-green-500" />}
+                              {gcState === 'error'   && <AlertCircle className="w-4 h-4 text-destructive" />}
+                              {gcState === 'idle'    && (
+                                <svg viewBox="0 0 24 24" className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M19 4h-1V2h-2v2H8V2H6v2H5C3.9 4 3 4.9 3 6v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11zM7 11h5v5H7z" fill="#4285F4"/>
+                                </svg>
+                              )}
+                            </button>
+                          )}
+                        </div>
                       </div>
-                      <h4 className="font-semibold text-sm">{evt.title}</h4>
-                      {evt.child_name && <p className="text-xs text-muted-foreground mt-0.5">{evt.child_name}</p>}
-                      {evt.description && <p className="text-xs mt-1">{evt.description}</p>}
-                      <p className="text-xs text-muted-foreground mt-1">Added by {evt.added_by}</p>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  );
+                })}
               </div>
             )}
           </CardContent>

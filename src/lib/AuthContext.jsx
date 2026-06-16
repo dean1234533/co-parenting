@@ -31,9 +31,9 @@ export const AuthProvider = ({ children }) => {
 
     const unsub = onSnapshot(profileRef, async (snap) => {
       if (!snap.exists()) {
-        // First login — create profile
+        // First login — create profile (leave displayName empty so ProfileSetup prompts for a real name)
         const newProfile = {
-          displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+          displayName: firebaseUser.displayName || '',
           email: firebaseUser.email,
           familyId: firebaseUser.uid,
           partnerId: null,
@@ -47,8 +47,10 @@ export const AuthProvider = ({ children }) => {
 
       let p = applyProfile(firebaseUser.uid, snap.data());
 
-      // Persist name so login page can greet returning users
-      if (p.displayName) localStorage.setItem('coparent_name', p.displayName);
+      // Persist name so login page can greet returning users (only if it's a real name, not an email)
+      if (p.displayName && !p.displayName.includes('@')) {
+        localStorage.setItem('coparent_name', p.displayName);
+      }
 
       // Apply any pending link left by a partner (avoids cross-user writes)
       if (!p.partnerId) {
