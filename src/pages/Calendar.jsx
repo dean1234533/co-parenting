@@ -47,6 +47,7 @@ export default function CalendarPage() {
   const [form, setForm] = useState({ title: "", description: "", date: "", time: "", event_type: "", child_name: "" });
   // Track per-event Google Calendar send state: { [eventId]: 'idle'|'loading'|'done'|'error' }
   const [gcalState, setGcalState] = useState({});
+  const [gcalError, setGcalError] = useState('');
   const queryClient = useQueryClient();
 
   const { data: currentUser } = useQuery({
@@ -77,14 +78,15 @@ export default function CalendarPage() {
 
   const handleSendToGCal = async (evt) => {
     setGcalState((s) => ({ ...s, [evt.id]: 'loading' }));
+    setGcalError('');
     try {
       await sendToGoogleCalendar(evt);
       setGcalState((s) => ({ ...s, [evt.id]: 'done' }));
-      // Reset back to idle after 3 seconds
       setTimeout(() => setGcalState((s) => ({ ...s, [evt.id]: 'idle' })), 3000);
     } catch (err) {
       console.error('Google Calendar error:', err);
       setGcalState((s) => ({ ...s, [evt.id]: 'error' }));
+      setGcalError(err.message || 'Failed to add to Google Calendar');
       setTimeout(() => setGcalState((s) => ({ ...s, [evt.id]: 'idle' })), 4000);
     }
   };
@@ -220,6 +222,11 @@ export default function CalendarPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            {gcalError && (
+              <div className="p-2 mb-2 bg-destructive/10 text-destructive text-xs rounded-lg">
+                Google Calendar error: {gcalError}
+              </div>
+            )}
             {!selectedDate ? (
               <p className="text-muted-foreground text-sm text-center py-4">Click on a day to see events</p>
             ) : selectedEvents.length === 0 ? (
