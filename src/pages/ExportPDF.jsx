@@ -68,7 +68,7 @@ export default function ExportPDF() {
           events:    sections.events    ? events    : [],
           rules:     sections.rules     ? rules     : [],
         },
-        'coparent-report.pdf'
+        'js-grw-up-report.pdf'
       );
     } finally {
       setGenerating(false);

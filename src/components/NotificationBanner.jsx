@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Bell, X } from 'lucide-react';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 
-const DISMISSED_KEY = 'coparent_notif_dismissed';
+const DISMISSED_KEY = 'jsgrwup_notif_dismissed';
 
 export default function NotificationBanner() {
   const { permission, requestPermission } = usePushNotifications();

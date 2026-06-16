@@ -6,7 +6,7 @@ import { format } from 'date-fns';
  * @param {object} data  — { messages, requests, incidents, progress, expenses, events, rules }
  * @param {string} filename
  */
-export function generateAndDownloadPDF(data, filename = 'coparent-report.pdf') {
+export function generateAndDownloadPDF(data, filename = 'js-grw-up-report.pdf') {
   const {
     messages  = [],
     requests  = [],

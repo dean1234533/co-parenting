@@ -57,7 +57,7 @@ export async function exportThenDeleteOldData() {
 
   // Step 1 — download the full archive PDF before deleting anything
   const cutoffLabel = format(new Date(retentionCutoff()), 'MMM-yyyy');
-  generateAndDownloadPDF(all, `coparent-archive-before-${cutoffLabel}.pdf`);
+  generateAndDownloadPDF(all, `js-grw-up-archive-before-${cutoffLabel}.pdf`);
 
   // Small delay so the browser has time to start the download
   await new Promise((r) => setTimeout(r, 400));
@@ -83,7 +83,7 @@ export async function exportThenDeleteOldData() {
   }
 
   // Remember when we last cleaned up
-  localStorage.setItem('coparent_last_cleanup', new Date().toISOString());
+  localStorage.setItem('jsgrwup_last_cleanup', new Date().toISOString());
 
   return deleted;
 }

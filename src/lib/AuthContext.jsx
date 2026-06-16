@@ -49,7 +49,7 @@ export const AuthProvider = ({ children }) => {
       const p = applyProfile(firebaseUser.uid, snap.data());
 
       if (p.displayName && !p.displayName.includes('@')) {
-        localStorage.setItem('coparent_name', p.displayName);
+        localStorage.setItem('jsgrwup_name', p.displayName);
       }
 
       if (firstSnapshot) {
@@ -125,7 +125,7 @@ export const AuthProvider = ({ children }) => {
     setProfile(null);
     setIsAuthenticated(false);
     setFamilyId(null);
-    localStorage.removeItem('coparent_name');
+    localStorage.removeItem('jsgrwup_name');
     if (shouldRedirect) window.location.href = '/login';
   };
 

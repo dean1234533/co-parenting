@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { auditRetention, exportThenDeleteOldData, RETENTION_MONTHS } from '@/lib/dataRetention';
 import { useAuth } from '@/lib/AuthContext';
 
-const SESSION_KEY = 'coparent_retention_checked';
+const SESSION_KEY = 'jsgrwup_retention_checked';
 
 export default function RetentionNotice() {
   const { profile } = useAuth();

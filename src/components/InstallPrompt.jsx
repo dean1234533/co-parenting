@@ -3,7 +3,7 @@ import { X, Download, Share, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const SESSION_KEY = 'coparent-install-dismissed';
+const SESSION_KEY = 'jsgrwup-install-dismissed';
 
 function isIOS() {
   return /iphone|ipad|ipod/i.test(navigator.userAgent) && !('MSStream' in window);

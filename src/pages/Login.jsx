@@ -15,7 +15,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const accountDeleted = new URLSearchParams(window.location.search).get('deleted') === 'true';
-  const savedName = !accountDeleted && localStorage.getItem('coparent_name')?.split(' ')[0];
+  const savedName = !accountDeleted && localStorage.getItem('jsgrwup_name')?.split(' ')[0];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
