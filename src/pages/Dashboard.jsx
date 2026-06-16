@@ -14,24 +14,40 @@ import StatCard from "@/components/dashboard/StatCard";
 import { format } from "date-fns";
 
 export default function Dashboard() {
+  // Dashboard queries use no orderBy so Firestore only needs auto-created
+  // single-field indexes — no manual composite index setup required.
+  const byDateDesc = (a, b) => (b.created_date || '').localeCompare(a.created_date || '');
+
   const { data: messages = [] } = useQuery({
     queryKey: ["messages"],
-    queryFn: () => db.entities.ChatMessage.list("-created_date", 5),
+    queryFn: async () => {
+      const all = await db.entities.ChatMessage.list();
+      return all.sort(byDateDesc).slice(0, 5);
+    },
   });
 
   const { data: requests = [] } = useQuery({
     queryKey: ["requests-pending"],
-    queryFn: () => db.entities.Request.filter({ status: "pending" }, "-created_date", 10),
+    queryFn: async () => {
+      const all = await db.entities.Request.list();
+      return all.filter(r => r.status === 'pending').sort(byDateDesc).slice(0, 10);
+    },
   });
 
   const { data: incidents = [] } = useQuery({
     queryKey: ["incidents-recent"],
-    queryFn: () => db.entities.IncidentReport.list("-created_date", 5),
+    queryFn: async () => {
+      const all = await db.entities.IncidentReport.list();
+      return all.sort((a, b) => (b.incident_date || '').localeCompare(a.incident_date || '')).slice(0, 5);
+    },
   });
 
   const { data: events = [] } = useQuery({
     queryKey: ["events-upcoming"],
-    queryFn: () => db.entities.CalendarEvent.list("-date", 5),
+    queryFn: async () => {
+      const all = await db.entities.CalendarEvent.list();
+      return all.sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 5);
+    },
   });
 
   return (
