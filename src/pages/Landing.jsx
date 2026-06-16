@@ -16,7 +16,10 @@ export default function Landing() {
 
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-4 border-b border-border max-w-6xl mx-auto">
-        <span className="text-xl font-heading font-bold text-primary">Js-Grw-Up</span>
+        <div className="flex items-center gap-2">
+          <img src="/icons/icon-96x96.png" alt="Js-Grw-Up" className="w-8 h-8 rounded-lg" />
+          <span className="text-xl font-heading font-bold text-primary">Js-Grw-Up</span>
+        </div>
         <div className="flex items-center gap-3">
           <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Log in</Link>
           <Link to="/register" className="text-sm bg-primary text-primary-foreground px-4 py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors">Get started free</Link>
@@ -25,6 +28,7 @@ export default function Landing() {
 
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-6 py-20 text-center">
+        <img src="/icons/icon-192x192.png" alt="Js-Grw-Up" className="w-24 h-24 rounded-2xl mx-auto mb-8 shadow-lg" />
         <div className="inline-flex items-center gap-2 bg-primary/10 text-primary text-xs font-semibold px-3 py-1.5 rounded-full mb-6">
           <Heart className="h-3.5 w-3.5" /> Built for the kids
         </div>
