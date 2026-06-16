@@ -1,5 +1,6 @@
 import React from "react";
 import { Heart } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function AuthLayout({ icon: Icon, title, subtitle, footer, children }) {
   return (
@@ -22,6 +23,11 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
         {footer && (
           <p className="text-center text-sm text-muted-foreground mt-6">{footer}</p>
         )}
+        <p className="text-center text-xs text-muted-foreground/60 mt-4">
+          <Link to="/terms" className="hover:text-primary transition-colors">Terms</Link>
+          {" · "}
+          <Link to="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+        </p>
       </div>
     </div>
   );

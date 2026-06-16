@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { auth, firestore } from '@/lib/firebase';
 import { deleteUser } from 'firebase/auth';
@@ -10,7 +11,7 @@ import {
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
   AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Trash2, LogOut, ShieldAlert } from 'lucide-react';
+import { Trash2, LogOut, ShieldAlert, FileText } from 'lucide-react';
 
 export default function Settings() {
   const { profile, logout } = useAuth();
@@ -79,6 +80,19 @@ export default function Settings() {
               <span className="font-medium">{profile.partnerName}</span>
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Legal */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <FileText className="h-4 w-4" /> Legal
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Link to="/terms" className="block text-sm text-primary hover:underline">Terms and Conditions</Link>
+          <Link to="/privacy" className="block text-sm text-primary hover:underline">Privacy Policy</Link>
         </CardContent>
       </Card>
 
