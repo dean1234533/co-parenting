@@ -46,6 +46,9 @@ export const AuthProvider = ({ children }) => {
 
       const p = applyProfile(firebaseUser.uid, snap.data());
 
+      // Persist name so login page can greet returning users
+      if (p.displayName) localStorage.setItem('coparent_name', p.displayName);
+
       if (firstSnapshot) {
         firstSnapshot = false;
         setUser({
@@ -96,6 +99,7 @@ export const AuthProvider = ({ children }) => {
     setProfile(null);
     setIsAuthenticated(false);
     setFamilyId(null);
+    localStorage.removeItem('coparent_name');
     if (shouldRedirect) window.location.href = '/login';
   };
 

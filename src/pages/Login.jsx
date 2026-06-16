@@ -14,6 +14,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const savedName = localStorage.getItem('coparent_name');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,7 +34,7 @@ export default function Login() {
   return (
     <AuthLayout
       icon={LogIn}
-      title="Welcome back"
+      title={savedName ? `Welcome back, ${savedName}` : "Welcome back"}
       subtitle="Log in to your account"
       footer={
         <>
