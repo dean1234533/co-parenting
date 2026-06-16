@@ -1,15 +1,10 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { auth, firestore } from '@/lib/firebase';
-import {
-  EmailAuthProvider, reauthenticateWithCredential, deleteUser,
-  GoogleAuthProvider, reauthenticateWithPopup,
-} from 'firebase/auth';
+import { deleteUser } from 'firebase/auth';
 import { doc, deleteDoc, updateDoc } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel,
   AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
@@ -20,11 +15,8 @@ import { Trash2, LogOut, ShieldAlert } from 'lucide-react';
 export default function Settings() {
   const { profile, logout } = useAuth();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [password, setPassword] = useState('');
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
-
-  const isGoogleUser = auth.currentUser?.providerData?.[0]?.providerId === 'google.com';
 
   const handleDeleteAccount = async () => {
     setDeleting(true);
@@ -32,20 +24,7 @@ export default function Settings() {
     try {
       const user = auth.currentUser;
 
-      // Re-authenticate before deletion (Firebase requires this)
-      if (isGoogleUser) {
-        await reauthenticateWithPopup(user, new GoogleAuthProvider());
-      } else {
-        if (!password) {
-          setError('Please enter your password to confirm deletion.');
-          setDeleting(false);
-          return;
-        }
-        const credential = EmailAuthProvider.credential(user.email, password);
-        await reauthenticateWithCredential(user, credential);
-      }
-
-      // If linked, clear partner's reference to this account
+      // If linked, clear partner's reference first
       if (profile?.partnerId) {
         await updateDoc(doc(firestore, 'users', profile.partnerId), {
           familyId: profile.partnerId,
@@ -54,7 +33,7 @@ export default function Settings() {
         });
       }
 
-      // Delete this user's Firestore profile
+      // Delete Firestore profile
       await deleteDoc(doc(firestore, 'users', user.uid));
 
       // Delete Firebase Auth account
@@ -63,12 +42,10 @@ export default function Settings() {
       window.location.href = '/login';
     } catch (err) {
       console.error('Delete account error:', err);
-      if (err.code === 'auth/wrong-password') {
-        setError('Incorrect password. Please try again.');
-      } else if (err.code === 'auth/requires-recent-login') {
-        setError('Please log out and log back in before deleting your account.');
+      if (err.code === 'auth/requires-recent-login') {
+        setError('Please sign out and sign back in, then try again.');
       } else {
-        setError(err.message || 'Failed to delete account. Please try again.');
+        setError('Failed to delete account. Please try again.');
       }
     } finally {
       setDeleting(false);
@@ -124,7 +101,7 @@ export default function Settings() {
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm text-muted-foreground">
-            Permanently delete your account and all your data. If you're linked with a co-parent, they will be automatically unlinked. This cannot be undone.
+            Permanently deletes your account. Cannot be undone.
           </p>
           <Button
             variant="destructive"
@@ -137,40 +114,15 @@ export default function Settings() {
         </CardContent>
       </Card>
 
-      {/* Delete confirmation dialog */}
       <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete your account?</AlertDialogTitle>
             <AlertDialogDescription>
-              This permanently deletes your profile and signs you out. Your co-parent will be unlinked. Shared records (messages, calendar etc.) are not deleted but will no longer be accessible to you.
+              Your account will be permanently deleted. This cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
-
-          {!isGoogleUser && (
-            <div className="py-2 space-y-2">
-              <Label htmlFor="confirm-password">Enter your password to confirm</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Your password"
-                autoComplete="current-password"
-              />
-            </div>
-          )}
-
-          {isGoogleUser && (
-            <p className="text-sm text-muted-foreground py-2">
-              You'll be asked to re-confirm with Google before deletion.
-            </p>
-          )}
-
-          {error && (
-            <p className="text-sm text-destructive">{error}</p>
-          )}
-
+          {error && <p className="text-sm text-destructive px-1">{error}</p>}
           <AlertDialogFooter>
             <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
