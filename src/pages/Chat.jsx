@@ -22,7 +22,7 @@ export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [loadingMessages, setLoadingMessages] = useState(true);
   const messagesEndRef = useRef(null);
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
 
   const { data: currentUser } = useQuery({
     queryKey: ["me"],
@@ -31,7 +31,7 @@ export default function Chat() {
 
   // Real-time Firestore listener — no polling
   useEffect(() => {
-    const familyId = profile?.familyId;
+    const familyId = profile?.familyId || user?.id;
     if (!familyId) {
       setLoadingMessages(false);
       return;
@@ -59,7 +59,7 @@ export default function Chat() {
     );
 
     return () => unsub();
-  }, [profile?.familyId]);
+  }, [profile?.familyId, user?.id]);
 
   const sendMutation = useMutation({
     mutationFn: (data) => db.entities.ChatMessage.create(data),
@@ -127,14 +127,7 @@ export default function Chat() {
       {/* Messages Area */}
       <Card className="flex-1 overflow-hidden flex flex-col">
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
-          {!profile?.familyId ? (
-            <div className="flex items-center justify-center h-full text-center px-6">
-              <p className="text-muted-foreground text-sm">
-                Link with your co-parent first to start messaging.<br />
-                Use <strong>Invite co-parent</strong> in the sidebar.
-              </p>
-            </div>
-          ) : loadingMessages ? (
+          {loadingMessages ? (
             <div className="flex items-center justify-center h-full">
               <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             </div>
@@ -212,7 +205,7 @@ export default function Chat() {
             />
             <Button
               onClick={handleSend}
-              disabled={!message.trim() || sendMutation.isPending || !!warning || !profile?.familyId}
+              disabled={!message.trim() || sendMutation.isPending || !!warning}
               className="px-6"
             >
               <Send className="h-4 w-4" />

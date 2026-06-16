@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
       });
     }
     setProfile(p);
-    if (p.familyId) setFamilyId(p.familyId);
+    setFamilyId(p.familyId || firebaseUser.uid);
     return p;
   };
 

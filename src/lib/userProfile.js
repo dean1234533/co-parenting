@@ -13,7 +13,7 @@ export async function createUserProfile(uid, { displayName, email }) {
   const profile = {
     displayName,
     email,
-    familyId: null,
+    familyId: uid,   // solo family until linked with partner
     partnerId: null,
     partnerName: null,
     createdAt: new Date().toISOString(),
