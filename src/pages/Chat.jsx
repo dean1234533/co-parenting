@@ -86,6 +86,7 @@ export default function Chat() {
     sendMutation.mutate({
       content: message.trim(),
       sender_name: profile?.displayName || "Unknown",
+      familyId: profile?.familyId,
     });
   };
 

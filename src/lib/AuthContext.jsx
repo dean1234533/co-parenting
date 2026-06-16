@@ -3,7 +3,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
 import { auth, firestore } from '@/lib/firebase';
 import { setFamilyId } from '@/api/db';
-import { applyPendingLink } from '@/lib/userProfile';
+import { applyPendingLink, updateUserProfile } from '@/lib/userProfile';
 
 const AuthContext = createContext();
 
@@ -22,16 +22,18 @@ export const AuthProvider = ({ children }) => {
     return p;
   };
 
+  const pendingUnsubRef = useRef(null);
+
   const subscribeToProfile = (firebaseUser) => {
-    // Tear down any existing listener
     if (profileUnsubRef.current) profileUnsubRef.current();
+    if (pendingUnsubRef.current) pendingUnsubRef.current();
 
     const profileRef = doc(firestore, 'users', firebaseUser.uid);
+    const pendingRef = doc(firestore, 'pendingLinks', firebaseUser.uid);
     let firstSnapshot = true;
 
     const unsub = onSnapshot(profileRef, async (snap) => {
       if (!snap.exists()) {
-        // First login — create profile (leave displayName empty so ProfileSetup prompts for a real name)
         const newProfile = {
           displayName: firebaseUser.displayName || '',
           email: firebaseUser.email,
@@ -41,24 +43,13 @@ export const AuthProvider = ({ children }) => {
           createdAt: new Date().toISOString(),
         };
         await setDoc(profileRef, newProfile);
-        // onSnapshot will fire again with the created doc
         return;
       }
 
-      let p = applyProfile(firebaseUser.uid, snap.data());
+      const p = applyProfile(firebaseUser.uid, snap.data());
 
-      // Persist name so login page can greet returning users (only if it's a real name, not an email)
       if (p.displayName && !p.displayName.includes('@')) {
         localStorage.setItem('coparent_name', p.displayName);
-      }
-
-      // Apply any pending link left by a partner (avoids cross-user writes)
-      if (!p.partnerId) {
-        applyPendingLink(firebaseUser.uid)
-          .then((link) => {
-            if (link) applyProfile(firebaseUser.uid, { ...snap.data(), ...link });
-          })
-          .catch(() => {});
       }
 
       if (firstSnapshot) {
@@ -78,7 +69,25 @@ export const AuthProvider = ({ children }) => {
       setAuthChecked(true);
     });
 
+    // Listen to pendingLinks in real-time so linking is instant even when
+    // the partner accepts while this user is already logged in
+    const pendingUnsub = onSnapshot(pendingRef, async (snap) => {
+      if (!snap.exists()) return;
+      const { familyId, partnerId, partnerName } = snap.data();
+      try {
+        await updateUserProfile(firebaseUser.uid, { familyId, partnerId, partnerName });
+        // profile onSnapshot will fire with the new values automatically
+      } catch {
+        // if update fails, still apply locally so current session works
+        applyProfile(firebaseUser.uid, {
+          ...(await getDoc(profileRef)).data(),
+          familyId, partnerId, partnerName,
+        });
+      }
+    }, () => {});
+
     profileUnsubRef.current = unsub;
+    pendingUnsubRef.current = pendingUnsub;
   };
 
   useEffect(() => {
@@ -87,6 +96,7 @@ export const AuthProvider = ({ children }) => {
         subscribeToProfile(firebaseUser);
       } else {
         if (profileUnsubRef.current) profileUnsubRef.current();
+        if (pendingUnsubRef.current) pendingUnsubRef.current();
         setUser(null);
         setProfile(null);
         setIsAuthenticated(false);
@@ -98,6 +108,7 @@ export const AuthProvider = ({ children }) => {
     return () => {
       unsubAuth();
       if (profileUnsubRef.current) profileUnsubRef.current();
+      if (pendingUnsubRef.current) pendingUnsubRef.current();
     };
   }, []);
 

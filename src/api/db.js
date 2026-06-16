@@ -62,8 +62,8 @@ const createEntityApi = (entityName) => {
     },
     async create(data) {
       const payload = {
-        ...data,
         familyId: currentFamilyId || null,
+        ...data,
         created_date: new Date().toISOString(),
         created_by_id: auth.currentUser?.uid || null,
       };
