@@ -1,8 +1,11 @@
 import db from '@/api/db';
 import { sendPartnerNotification } from '@/lib/notify';
 
-import React, { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import React, { useState, useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
+import { firestore } from '@/lib/firebase';
+import { useAuth } from '@/lib/AuthContext';
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -36,17 +39,28 @@ export default function Requests() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ type: "", title: "", description: "", date_from: "", date_to: "" });
   const [ruleWarning, setRuleWarning] = useState("");
+  const [requests, setRequests] = useState([]);
   const queryClient = useQueryClient();
+  const { profile, user } = useAuth();
+  const currentUser = { id: user?.id, full_name: profile?.displayName };
 
-  const { data: currentUser } = useQuery({
-    queryKey: ["me"],
-    queryFn: () => db.auth.me(),
-  });
+  // Real-time listener so both users see updates the instant they happen
+  useEffect(() => {
+    const familyId = profile?.familyId;
+    if (!familyId) return;
 
-  const { data: requests = [], isLoading } = useQuery({
-    queryKey: ["requests"],
-    queryFn: () => db.entities.Request.list("-created_date", 50),
-  });
+    const q = query(
+      collection(firestore, 'requests'),
+      where('familyId', '==', familyId),
+      orderBy('created_date', 'desc')
+    );
+
+    const unsub = onSnapshot(q, (snap) => {
+      setRequests(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    });
+
+    return () => unsub();
+  }, [profile?.familyId]);
 
   const createMutation = useMutation({
     mutationFn: (data) => db.entities.Request.create(data),
@@ -57,7 +71,7 @@ export default function Requests() {
       setRuleWarning("");
       sendPartnerNotification({
         title: 'New Request',
-        body: `${currentUser?.full_name || 'Your co-parent'} has submitted a new request`,
+        body: `${profile?.displayName || 'Your co-parent'} has submitted a new request`,
         data: { type: 'request' },
       });
     },
@@ -95,7 +109,8 @@ export default function Requests() {
 
     createMutation.mutate({
       ...form,
-      requester_name: currentUser?.full_name || "Unknown",
+      requester_name: profile?.displayName || "Unknown",
+      familyId: profile?.familyId,
       status: "pending",
     });
   };
