@@ -22,11 +22,11 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait',
         scope: '/',
-        start_url: '/',
+        start_url: '/?source=pwa',
         categories: ['lifestyle', 'productivity'],
         screenshots: [
           {
-            src: 'screenshot.jpg',
+            src: 'https://js-grw-up.com/screenshot.jpg',
             sizes: '2879x1556',
             type: 'image/jpeg',
             form_factor: 'wide',
