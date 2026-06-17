@@ -3,6 +3,7 @@ import { sendToGoogleCalendar } from '@/lib/googleCalendar';
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from '@/lib/AuthContext';
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,8 @@ function GCalIcon({ className }) {
 }
 
 export default function CalendarPage() {
+  const { profile } = useAuth();
+  const canUseGCal = profile?.isAdmin === true || profile?.calendarAccess === true;
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [open, setOpen] = useState(false);
@@ -252,8 +255,8 @@ export default function CalendarPage() {
                             <p className="text-xs text-muted-foreground mt-1">Added by {evt.added_by}</p>
                           </div>
 
-                          {/* Send to Google Calendar button */}
-                          {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+                          {/* Send to Google Calendar button — admin + calendarAccess users only until OAuth verified */}
+                          {import.meta.env.VITE_GOOGLE_CLIENT_ID && canUseGCal && (
                             <button
                               onClick={() => handleSendToGCal(evt)}
                               disabled={gcState === 'loading' || gcState === 'done'}

@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   MessageSquare, CalendarDays, AlertTriangle, GraduationCap,
   PoundSterling, Receipt, FileText, BookOpen, ClipboardCheck,
-  Home, Menu, X, ChevronRight, Heart, NotebookPen, Bell, BellOff, BellRing, UserPlus, Unlink, Settings, Sparkles
+  Home, Menu, X, ChevronRight, Heart, NotebookPen, Bell, BellOff, BellRing, UserPlus, Unlink, Settings, Sparkles, HelpCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -182,13 +182,23 @@ export default function Sidebar() {
               Upgrade to Premium · £5/mo
             </Link>
           )}
+          <a
+            href="https://wa.me/447752300937"
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => setMobileOpen(false)}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
+          >
+            <HelpCircle className="h-4 w-4" />
+            Help &amp; Support
+          </a>
           <Link
             to="/settings"
             onClick={() => setMobileOpen(false)}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors"
           >
             <Settings className="h-4 w-4" />
-            Settings & Account
+            Settings &amp; Account
           </Link>
           <p className="text-xs text-sidebar-foreground/40 text-center">
             Keeping it civil, for the kids
