@@ -84,9 +84,7 @@ export default function Sidebar() {
         {/* Logo */}
         <div className="p-6 border-b border-sidebar-border">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center">
-              <Heart className="h-5 w-5 text-primary-foreground" />
-            </div>
+            <img src="/icons/icon-96x96.png" alt="Js-Grw-Up" className="w-10 h-10 rounded-xl" />
             <div className="min-w-0">
               <h1 className="text-lg font-heading font-bold text-sidebar-foreground">Js-Grw-Up</h1>
               {profile?.displayName && (
