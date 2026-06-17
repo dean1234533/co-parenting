@@ -46,15 +46,18 @@ export default function Landing() {
       />
 
       {/* Nav */}
-      <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
+      <nav className="sticky top-0 z-50 bg-gradient-to-r from-violet-700 via-purple-700 to-pink-700 shadow-lg shadow-violet-900/30">
         <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
-          <div className="flex items-center gap-2">
-            <img src="/icons/icon-96x96.png" alt="Js-Grw-Up" className="w-8 h-8 rounded-lg" />
-            <span className="text-xl font-heading font-bold text-primary">Js-Grw-Up</span>
+          <div className="flex items-center gap-3">
+            <img src="/icons/icon-96x96.png" alt="Js-Grw-Up" className="w-9 h-9 rounded-xl ring-2 ring-white/30 shadow-md" />
+            <div className="flex flex-col leading-none">
+              <span className="text-lg font-heading font-black text-white tracking-wide uppercase">Js-Grw-Up</span>
+              <span className="text-[10px] text-white/60 font-medium tracking-widest uppercase">Co‑Parenting App</span>
+            </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Log in</Link>
-            <Link to="/register" className="text-sm bg-gradient-to-r from-violet-600 to-pink-600 text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity shadow-lg shadow-violet-500/25">
+            <Link to="/login" className="text-sm text-white/80 hover:text-white font-medium transition-colors px-3 py-1.5">Log in</Link>
+            <Link to="/register" className="text-sm bg-white text-violet-700 px-4 py-2 rounded-xl font-bold hover:bg-yellow-50 transition-colors shadow-md">
               Get started free
             </Link>
           </div>
