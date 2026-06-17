@@ -74,25 +74,29 @@ async function getGoogleAccessToken(saEmail, privateKeyPem, scope) {
   return access_token;
 }
 
-const jsonRes = (data, status = 200) =>
+const ALLOWED_ORIGIN = 'https://js-grw-up.com';
+
+const corsHeaders = (origin) => ({
+  'Access-Control-Allow-Origin': origin === ALLOWED_ORIGIN ? origin : ALLOWED_ORIGIN,
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+});
+
+const jsonRes = (data, status = 200, origin = '') =>
   new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
   });
 
-export async function onRequestOptions() {
-  return new Response(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+export async function onRequestOptions({ request }) {
+  const origin = request.headers.get('Origin') || '';
+  return new Response(null, { status: 204, headers: corsHeaders(origin) });
 }
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+  const origin = request.headers.get('Origin') || '';
+  if (origin !== ALLOWED_ORIGIN) return jsonRes({ error: 'Forbidden' }, 403, origin);
 
   const API_KEY    = env.VITE_FIREBASE_API_KEY;
   const PROJECT_ID = env.VITE_FIREBASE_PROJECT_ID;
@@ -100,13 +104,13 @@ export async function onRequestPost(context) {
   const SA_KEY     = env.FIREBASE_SA_PRIVATE_KEY;
 
   if (!API_KEY || !PROJECT_ID || !SA_EMAIL || !SA_KEY) {
-    return jsonRes({ error: 'Server misconfiguration — missing env vars' }, 500);
+    return jsonRes({ error: 'Server misconfiguration — missing env vars' }, 500, origin);
   }
 
   // Validate Authorization header
   const authHeader = request.headers.get('Authorization') || '';
   if (!authHeader.startsWith('Bearer ')) {
-    return jsonRes({ error: 'Unauthorized' }, 401);
+    return jsonRes({ error: 'Unauthorized' }, 401, origin);
   }
   const idToken = authHeader.slice(7);
 
@@ -115,7 +119,7 @@ export async function onRequestPost(context) {
   try {
     body = await request.json();
   } catch {
-    return jsonRes({ error: 'Invalid request body' }, 400);
+    return jsonRes({ error: 'Invalid request body' }, 400, origin);
   }
   const { title = 'Js-Grw-Up', body: msgBody = '', data = {} } = body;
 
@@ -128,30 +132,30 @@ export async function onRequestPost(context) {
       body: JSON.stringify({ idToken }),
     }
   );
-  if (!lookupRes.ok) return jsonRes({ error: 'Token verification failed' }, 401);
+  if (!lookupRes.ok) return jsonRes({ error: 'Token verification failed' }, 401, origin);
 
   const { users } = await lookupRes.json();
   const senderUid = users?.[0]?.localId;
-  if (!senderUid) return jsonRes({ error: 'User not found' }, 401);
+  if (!senderUid) return jsonRes({ error: 'User not found' }, 401, origin);
 
   // Fetch sender's Firestore profile (with their ID token — rules allow self-read)
   const fsBase = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
   const userRes = await fetch(`${fsBase}/users/${senderUid}`, {
     headers: { Authorization: `Bearer ${idToken}` },
   });
-  if (!userRes.ok) return jsonRes({ skipped: 'Sender profile not found' });
+  if (!userRes.ok) return jsonRes({ skipped: 'Sender profile not found' }, 200, origin);
 
   const partnerUid = (await userRes.json()).fields?.partnerId?.stringValue;
-  if (!partnerUid) return jsonRes({ skipped: 'No partner linked' });
+  if (!partnerUid) return jsonRes({ skipped: 'No partner linked' }, 200, origin);
 
   // Fetch partner's FCM token (rules allow linked partners to read this)
   const tokenRes = await fetch(`${fsBase}/fcmTokens/${partnerUid}`, {
     headers: { Authorization: `Bearer ${idToken}` },
   });
-  if (!tokenRes.ok) return jsonRes({ skipped: 'Partner has no FCM token' });
+  if (!tokenRes.ok) return jsonRes({ skipped: 'Partner has no FCM token' }, 200, origin);
 
   const fcmToken = (await tokenRes.json()).fields?.token?.stringValue;
-  if (!fcmToken) return jsonRes({ skipped: 'FCM token empty' });
+  if (!fcmToken) return jsonRes({ skipped: 'FCM token empty' }, 200, origin);
 
   // Get a short-lived OAuth2 access token from the service account
   let accessToken;
@@ -162,7 +166,7 @@ export async function onRequestPost(context) {
       'https://www.googleapis.com/auth/firebase.messaging'
     );
   } catch (err) {
-    return jsonRes({ error: `Auth error: ${err.message}` }, 500);
+    return jsonRes({ error: `Auth error: ${err.message}` }, 500, origin);
   }
 
   // Send via FCM HTTP v1 API
@@ -200,8 +204,8 @@ export async function onRequestPost(context) {
 
   if (!fcmRes.ok) {
     const err = await fcmRes.text();
-    return jsonRes({ error: `FCM v1 error: ${err}` }, 500);
+    return jsonRes({ error: `FCM v1 error: ${err}` }, 500, origin);
   }
 
-  return jsonRes({ success: true });
+  return jsonRes({ success: true }, 200, origin);
 }

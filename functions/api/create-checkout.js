@@ -3,17 +3,24 @@
  * Creates a Stripe Checkout session for the £5/month subscription.
  * Returns { url } — the client redirects to it.
  */
+const ALLOWED_ORIGIN = 'https://js-grw-up.com';
+
 export async function onRequestPost({ request, env }) {
+  const origin = request.headers.get('Origin') || '';
+  if (origin !== ALLOWED_ORIGIN) return json({ error: 'Forbidden' }, 403, origin);
+
   const authHeader = request.headers.get('Authorization') || '';
   const idToken = authHeader.replace('Bearer ', '').trim();
-  if (!idToken) return json({ error: 'Unauthorised' }, 401);
+  if (!idToken) return json({ error: 'Unauthorised' }, 401, origin);
 
   const uid = await verifyFirebaseToken(idToken, env);
-  if (!uid) return json({ error: 'Invalid token' }, 401);
+  if (!uid) return json({ error: 'Invalid token' }, 401, origin);
 
   const body = await request.json().catch(() => ({}));
-  const successUrl = body.successUrl || 'https://js-grw-up.com/subscribe?success=true';
-  const cancelUrl  = body.cancelUrl  || 'https://js-grw-up.com/subscribe?cancelled=true';
+
+  // Validate redirect URLs — must point to our own domain to prevent open-redirect
+  const successUrl = sanitiseRedirect(body.successUrl, '/subscribe?success=true');
+  const cancelUrl  = sanitiseRedirect(body.cancelUrl,  '/subscribe?cancelled=true');
 
   const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
     method: 'POST',
@@ -34,16 +41,42 @@ export async function onRequestPost({ request, env }) {
   });
 
   const session = await res.json();
-  if (!res.ok) return json({ error: session.error?.message || 'Stripe error' }, 500);
-  return json({ url: session.url });
+  if (!res.ok) return json({ error: session.error?.message || 'Stripe error' }, 500, origin);
+  return json({ url: session.url }, 200, origin);
+}
+
+export async function onRequestOptions({ request }) {
+  const origin = request.headers.get('Origin') || '';
+  return new Response(null, {
+    status: 204,
+    headers: corsHeaders(origin),
+  });
 }
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
-function json(data, status = 200) {
+function sanitiseRedirect(url, fallbackPath) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.origin === ALLOWED_ORIGIN) return url;
+  } catch {}
+  return `${ALLOWED_ORIGIN}${fallbackPath}`;
+}
+
+function corsHeaders(origin) {
+  const allowed = origin === ALLOWED_ORIGIN ? origin : ALLOWED_ORIGIN;
+  return {
+    'Access-Control-Allow-Origin': allowed,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Authorization, Content-Type',
+    'Access-Control-Max-Age': '86400',
+  };
+}
+
+function json(data, status = 200, origin = '') {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+    headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
   });
 }
 

@@ -57,25 +57,29 @@ async function getAdminToken(saEmail, privateKeyPem) {
   return access_token;
 }
 
-const jsonRes = (data, status = 200) =>
+const ALLOWED_ORIGIN = 'https://js-grw-up.com';
+
+const corsHeaders = (origin) => ({
+  'Access-Control-Allow-Origin': origin === ALLOWED_ORIGIN ? origin : ALLOWED_ORIGIN,
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+});
+
+const jsonRes = (data, status = 200, origin = '') =>
   new Response(JSON.stringify(data), {
     status,
-    headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+    headers: { 'Content-Type': 'application/json', ...corsHeaders(origin) },
   });
 
-export async function onRequestOptions() {
-  return new Response(null, {
-    status: 204,
-    headers: {
-      'Access-Control-Allow-Origin':  '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    },
-  });
+export async function onRequestOptions({ request }) {
+  const origin = request.headers.get('Origin') || '';
+  return new Response(null, { status: 204, headers: corsHeaders(origin) });
 }
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+  const origin = request.headers.get('Origin') || '';
+  if (origin !== ALLOWED_ORIGIN) return jsonRes({ error: 'Forbidden' }, 403, origin);
 
   const API_KEY    = env.VITE_FIREBASE_API_KEY;
   const PROJECT_ID = env.VITE_FIREBASE_PROJECT_ID;
@@ -84,22 +88,22 @@ export async function onRequestPost(context) {
 
   // Verify the caller's Firebase ID token
   const authHeader = request.headers.get('Authorization') || '';
-  if (!authHeader.startsWith('Bearer ')) return jsonRes({ error: 'Unauthorized' }, 401);
+  if (!authHeader.startsWith('Bearer ')) return jsonRes({ error: 'Unauthorized' }, 401, origin);
   const idToken = authHeader.slice(7);
 
   if (!API_KEY || !PROJECT_ID) {
-    return jsonRes({ error: 'Server misconfiguration: missing Firebase env vars' }, 500);
+    return jsonRes({ error: 'Server misconfiguration: missing Firebase env vars' }, 500, origin);
   }
 
   const lookupRes = await fetch(
     `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${API_KEY}`,
     { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idToken }) }
   );
-  if (!lookupRes.ok) return jsonRes({ error: 'Token verification failed' }, 401);
+  if (!lookupRes.ok) return jsonRes({ error: 'Token verification failed' }, 401, origin);
 
   const { users } = await lookupRes.json();
   const uid = users?.[0]?.localId;
-  if (!uid) return jsonRes({ error: 'User not found' }, 401);
+  if (!uid) return jsonRes({ error: 'User not found' }, 401, origin);
 
   const fsBase = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
 
@@ -113,9 +117,8 @@ export async function onRequestPost(context) {
     try {
       adminToken = await getAdminToken(SA_EMAIL, SA_KEY);
     } catch (err) {
-      // Log but don't fail — Firestore data is already gone
       console.error('Admin token error:', err.message);
-      return jsonRes({ success: true, authDeleted: false, note: 'Firestore deleted; Auth user not removed (admin token failed)' });
+      return jsonRes({ success: true, authDeleted: false, note: 'Firestore deleted; Auth user not removed (admin token failed)' }, 200, origin);
     }
 
     // batchDelete is the admin endpoint — no recent-login restriction
@@ -130,18 +133,15 @@ export async function onRequestPost(context) {
 
     const deleteBody = await deleteRes.json().catch(() => ({}));
 
-    // batchDelete returns 200 with {errors:[...], successCount:N}
-    // Check for errors in the response body even when status is 200
     if (!deleteRes.ok || (deleteBody.errors && deleteBody.errors.length > 0)) {
       console.error('batchDelete error:', JSON.stringify(deleteBody));
-      // Firestore is already deleted — return partial success so client can sign out
       return jsonRes({
         success: true,
         authDeleted: false,
         note: `Firestore deleted; Auth delete error: ${JSON.stringify(deleteBody.errors || deleteBody)}`,
-      });
+      }, 200, origin);
     }
   }
 
-  return jsonRes({ success: true, authDeleted: !!SA_EMAIL });
+  return jsonRes({ success: true, authDeleted: !!SA_EMAIL }, 200, origin);
 }
