@@ -4,7 +4,7 @@ import SEO from '@/components/SEO';
 
 const features = [
   { icon: MessageCircle, title: 'Private Messaging', desc: 'A dedicated chat channel just for co-parenting — separate from personal texts so nothing gets missed.', color: 'from-violet-500 to-purple-600', bg: 'bg-violet-50 dark:bg-violet-950/30', border: 'border-violet-200 dark:border-violet-800' },
-  { icon: CalendarDays, title: 'Shared Calendar', desc: 'Pickups, drop-offs, school events and holidays in one shared view. Sync directly to Google Calendar.', color: 'from-blue-500 to-cyan-500', bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-200 dark:border-blue-800' },
+  { icon: CalendarDays, title: 'Shared Calendar', desc: 'Pickups, drop-offs, school events and holidays in one shared view — always in sync.', color: 'from-blue-500 to-cyan-500', bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-200 dark:border-blue-800' },
   { icon: FileText, title: 'Incident Reports', desc: 'Log and date-stamp incidents with supporting notes. Exportable to PDF for legal use.', color: 'from-rose-500 to-pink-500', bg: 'bg-rose-50 dark:bg-rose-950/30', border: 'border-rose-200 dark:border-rose-800' },
   { icon: Receipt, title: 'Expense Tracking', desc: 'Record shared costs, upload receipts and maintain a clear financial record for both parents.', color: 'from-emerald-500 to-teal-500', bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-800' },
   { icon: BookOpen, title: 'Daily Logs', desc: 'Keep daily notes on meals, mood, behaviour and milestones — always on record.', color: 'from-amber-500 to-orange-500', bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200 dark:border-amber-800' },
@@ -26,7 +26,7 @@ const paidPlan = [
   'Progress tracking',
   'Co-parenting rules',
   'Export full PDF archive',
-  'Google Calendar sync',
+  'Priority support',
   'Priority support',
 ];
 
