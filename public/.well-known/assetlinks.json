@@ -2,7 +2,7 @@
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target": {
     "namespace": "android_app",
-    "package_name": "com.jsgrwup.app",
-    "sha256_cert_fingerprints": ["PLACEHOLDER"]
+    "package_name": "com.js_grw_up.twa",
+    "sha256_cert_fingerprints": ["16:4B:83:5C:5B:93:CE:03:EA:78:00:A3:16:A7:9D:3A:AC:FD:F7:66:04:85:BC:FA:BF:78:CF:38:A1:A9:FF:CB"]
   }
 }]
