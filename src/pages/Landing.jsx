@@ -49,7 +49,7 @@ export default function Landing() {
       <nav className="sticky top-0 z-50 bg-gradient-to-r from-violet-700 via-purple-700 to-pink-700 shadow-lg shadow-violet-900/30 border-b-2 border-white/40">
         <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
           <div className="flex items-center gap-3">
-            <img src="/icons/icon-96x96.png" alt="Js-Grw-Up" className="w-9 h-9 rounded-xl ring-2 ring-white/30 shadow-md" />
+            <img src="/icons/icon-96x96.png" alt="Js-Grw-Up" className="w-9 h-9 rounded-xl ring-2 ring-white border-2 border-white bg-white shadow-md object-cover" />
             <div className="flex flex-col leading-none">
               <span className="text-lg font-heading font-black text-white tracking-wide uppercase">Js-Grw-Up</span>
               <span className="text-[10px] text-white/60 font-medium tracking-widest uppercase">Co‑Parenting App</span>
