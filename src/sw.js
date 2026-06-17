@@ -89,6 +89,31 @@ onBackgroundMessage(messaging, (payload) => {
   });
 });
 
+// Raw push handler — required for PWABuilder detection.
+// FCM's onBackgroundMessage (above) handles actual notification display.
+self.addEventListener('push', (event) => {
+  if (event.data) {
+    try {
+      const payload = event.data.json();
+      const title = payload.notification?.title || 'Js-Grw-Up';
+      const body  = payload.notification?.body  || '';
+      // Only show manually if FCM didn't already handle it
+      event.waitUntil(
+        self.registration.getNotifications().then((existing) => {
+          if (existing.length === 0) {
+            return self.registration.showNotification(title, {
+              body,
+              icon: '/icons/icon-192x192.png',
+              badge: '/icons/icon-192x192.png',
+              vibrate: [200, 100, 200],
+            });
+          }
+        })
+      );
+    } catch {}
+  }
+});
+
 // Handle notification click — open the app
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
