@@ -12,10 +12,10 @@ export default function NotificationBanner() {
     if (
       permission === 'default' &&
       typeof Notification !== 'undefined' &&
-      !localStorage.getItem(DISMISSED_KEY)
+      !localStorage.getItem(DISMISSED_KEY) &&
+      !sessionStorage.getItem(DISMISSED_KEY)
     ) {
-      // Delay slightly so the UI settles first
-      const t = setTimeout(() => setVisible(true), 1500);
+      const t = setTimeout(() => setVisible(true), 3000);
       return () => clearTimeout(t);
     } else {
       setVisible(false);
@@ -25,12 +25,14 @@ export default function NotificationBanner() {
   if (!visible) return null;
 
   const handleEnable = async () => {
+    localStorage.setItem(DISMISSED_KEY, '1');
     setVisible(false);
     await requestPermission();
   };
 
   const handleDismiss = () => {
     localStorage.setItem(DISMISSED_KEY, '1');
+    sessionStorage.setItem(DISMISSED_KEY, '1');
     setVisible(false);
   };
 
