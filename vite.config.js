@@ -13,6 +13,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
       manifest: {
+        id: 'com.jsgrwup.app',
         name: 'Js-Grw-Up',
         short_name: 'Js-Grw-Up',
         description: 'Co-parenting communication and coordination — together for the kids.',
@@ -23,6 +24,15 @@ export default defineConfig({
         scope: '/',
         start_url: '/',
         categories: ['lifestyle', 'productivity'],
+        screenshots: [
+          {
+            src: 'screenshot.jpg',
+            sizes: '2879x1556',
+            type: 'image/jpeg',
+            form_factor: 'wide',
+            label: 'Js-Grw-Up — Co-parenting App',
+          },
+        ],
         icons: [
           { src: 'icons/icon-72x72.png',   sizes: '72x72',   type: 'image/png', purpose: 'any' },
           { src: 'icons/icon-96x96.png',   sizes: '96x96',   type: 'image/png', purpose: 'any' },
