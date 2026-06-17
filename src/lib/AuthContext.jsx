@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
           partnerName: null,
           createdAt: new Date().toISOString(),
         };
-        await setDoc(profileRef, newProfile);
+        await setDoc(profileRef, newProfile, { merge: true });
         return;
       }
 

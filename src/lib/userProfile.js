@@ -18,7 +18,7 @@ export async function createUserProfile(uid, { displayName, email }) {
     partnerName: null,
     createdAt: new Date().toISOString(),
   };
-  await setDoc(doc(firestore, 'users', uid), profile);
+  await setDoc(doc(firestore, 'users', uid), profile, { merge: true });
   if (auth.currentUser) {
     await updateProfile(auth.currentUser, { displayName });
   }
