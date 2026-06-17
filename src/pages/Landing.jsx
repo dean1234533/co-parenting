@@ -65,7 +65,7 @@ export default function Landing() {
       </nav>
 
       {/* Hero */}
-      <section className="relative overflow-x-hidden overflow-y-visible">
+      <section className="relative [overflow-x:clip]">
         {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-purple-600 to-pink-600 opacity-90" />
         {/* Decorative blobs */}
