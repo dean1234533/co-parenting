@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { MessageCircle, CalendarDays, FileText, ShieldCheck, Receipt, BookOpen, ChevronRight, Heart, Lock, Users } from 'lucide-react';
+import { MessageCircle, CalendarDays, FileText, ShieldCheck, Receipt, BookOpen, ChevronRight, Heart, Lock, Users, Check, Sparkles } from 'lucide-react';
 
 const features = [
   { icon: MessageCircle, title: 'Private Messaging', desc: 'A dedicated chat channel just for co-parenting — separate from personal texts so nothing gets missed.' },
@@ -8,6 +8,25 @@ const features = [
   { icon: Receipt, title: 'Expense Tracking', desc: 'Record shared costs, upload receipts and maintain a clear financial record for both parents.' },
   { icon: BookOpen, title: 'Daily Logs', desc: 'Keep daily notes on meals, mood, behaviour and milestones — always on record.' },
   { icon: ShieldCheck, title: 'Co-Parenting Rules', desc: 'Set agreed rules and reference them any time. Requests can only be denied with a valid written reason.' },
+];
+
+const freePlan = [
+  'Private messaging',
+  'Shared calendar',
+  'Requests & approvals',
+  'Link with your co-parent',
+];
+
+const paidPlan = [
+  'Everything in Free',
+  'Incident reports (court-ready)',
+  'Expense tracking & receipts',
+  'Daily logs',
+  'Progress tracking',
+  'Co-parenting rules',
+  'Export full PDF archive',
+  'Google Calendar sync',
+  'Priority support',
 ];
 
 export default function Landing() {
@@ -66,8 +85,55 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Trust strip */}
+      {/* Pricing */}
       <section className="border-t border-border bg-muted/30">
+        <div className="max-w-4xl mx-auto px-6 py-20">
+          <h2 className="text-3xl font-heading font-bold text-center mb-3">Simple, honest pricing</h2>
+          <p className="text-muted-foreground text-center mb-12">Start free. Upgrade when you need more. Cancel any time.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+            {/* Free */}
+            <div className="bg-card border border-border rounded-2xl p-8">
+              <h3 className="text-xl font-heading font-bold mb-1">Free</h3>
+              <div className="text-4xl font-bold mb-6">£0<span className="text-base font-normal text-muted-foreground">/month</span></div>
+              <ul className="space-y-3 mb-8">
+                {freePlan.map(f => (
+                  <li key={f} className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-green-500 shrink-0" />{f}
+                  </li>
+                ))}
+              </ul>
+              <Link to="/register" className="block w-full text-center border border-border px-6 py-3 rounded-lg font-semibold text-sm hover:bg-muted transition-colors">
+                Get started free
+              </Link>
+            </div>
+
+            {/* Premium */}
+            <div className="bg-card border-2 border-primary rounded-2xl p-8 relative">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-semibold px-4 py-1.5 rounded-full flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5" /> Most popular
+              </div>
+              <h3 className="text-xl font-heading font-bold mb-1">Premium</h3>
+              <div className="text-4xl font-bold mb-6">£5<span className="text-base font-normal text-muted-foreground">/month</span></div>
+              <ul className="space-y-3 mb-8">
+                {paidPlan.map(f => (
+                  <li key={f} className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-primary shrink-0" />{f}
+                  </li>
+                ))}
+              </ul>
+              <Link to="/register" className="block w-full text-center bg-primary text-primary-foreground px-6 py-3 rounded-lg font-semibold text-sm hover:bg-primary/90 transition-colors">
+                Start free, upgrade later
+              </Link>
+              <p className="text-xs text-muted-foreground text-center mt-3">No credit card needed to start</p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Trust strip */}
+      <section className="border-t border-border">
         <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-3 gap-8 text-center">
           <div>
             <Lock className="h-6 w-6 text-primary mx-auto mb-3" />

@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   MessageSquare, CalendarDays, AlertTriangle, GraduationCap,
   PoundSterling, Receipt, FileText, BookOpen, ClipboardCheck,
-  Home, Menu, X, ChevronRight, Heart, NotebookPen, Bell, BellOff, BellRing, UserPlus, Unlink, Settings
+  Home, Menu, X, ChevronRight, Heart, NotebookPen, Bell, BellOff, BellRing, UserPlus, Unlink, Settings, Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from '@/lib/AuthContext';
+import { useSubscription } from '@/hooks/useSubscription';
 import InvitePartner from '@/components/InvitePartner';
 import { unlinkPartners } from '@/lib/userProfile';
 import { auth } from '@/lib/firebase';
@@ -37,6 +38,7 @@ export default function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
   const [showUnlinkConfirm, setShowUnlinkConfirm] = useState(false);
+  const { isPaid } = useSubscription();
   const [unlinking, setUnlinking] = useState(false);
   const { permission, requestPermission } = usePushNotifications();
   const { profile } = useAuth();
@@ -169,6 +171,16 @@ export default function Sidebar() {
               <BellOff className="h-4 w-4" />
               Notifications blocked
             </div>
+          )}
+          {!isPaid && (
+            <Link
+              to="/subscribe"
+              onClick={() => setMobileOpen(false)}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+            >
+              <Sparkles className="h-4 w-4" />
+              Upgrade to Premium · £5/mo
+            </Link>
           )}
           <Link
             to="/settings"
