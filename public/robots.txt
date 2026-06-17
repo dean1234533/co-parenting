@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /chat
+Disallow: /requests
+Disallow: /calendar
+Disallow: /incidents
+Disallow: /progress
+Disallow: /finances
+Disallow: /receipts
+Disallow: /daily-log
+Disallow: /rules
+Disallow: /export
+Disallow: /settings
+Disallow: /invite/
+
+Sitemap: https://js-grw-up.com/sitemap.xml

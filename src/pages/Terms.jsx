@@ -1,4 +1,5 @@
 import React from 'react';
+import SEO from '@/components/SEO';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Heart } from 'lucide-react';
 
@@ -12,6 +13,7 @@ const Section = ({ title, children }) => (
 export default function Terms() {
   return (
     <div className="min-h-screen bg-background">
+      <SEO path="/terms" title="Terms & Conditions" description="Read the Js-Grw-Up Terms and Conditions. Understand your rights and responsibilities when using our co-parenting app." noIndex={false} />
       {/* Header */}
       <div className="border-b border-border bg-card sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center gap-4">

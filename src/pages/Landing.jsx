@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { MessageCircle, CalendarDays, FileText, ShieldCheck, Receipt, BookOpen, ChevronRight, Heart, Lock, Users, Check, Sparkles } from 'lucide-react';
+import SEO from '@/components/SEO';
 
 const features = [
   { icon: MessageCircle, title: 'Private Messaging', desc: 'A dedicated chat channel just for co-parenting — separate from personal texts so nothing gets missed.' },
@@ -32,6 +33,11 @@ const paidPlan = [
 export default function Landing() {
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <SEO
+        path="/"
+        title="Co-parenting App for Separated Parents"
+        description="Js-Grw-Up is the private co-parenting app for separated parents. Shared calendar, safe messaging, incident reports, expense tracking and court-ready PDF export. Free to start."
+      />
 
       {/* Nav */}
       <nav className="flex items-center justify-between px-6 py-4 border-b border-border max-w-6xl mx-auto">

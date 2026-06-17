@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import SEO from '@/components/SEO';
 import { useAuth } from '@/lib/AuthContext';
 import { auth } from '@/lib/firebase';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -70,6 +71,7 @@ export default function Subscribe() {
 
   return (
     <div className="space-y-8 max-w-3xl mx-auto">
+      <SEO path="/subscribe" title="Pricing — Free & Premium Plans" description="Js-Grw-Up is free to start. Upgrade to Premium for £5/month to unlock incident reports, expense tracking, PDF export, Google Calendar sync and more." />
       <div className="text-center">
         <h1 className="text-3xl font-heading font-bold mb-2">Choose your plan</h1>
         <p className="text-muted-foreground">Start free. Upgrade when you need more.</p>
