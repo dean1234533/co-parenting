@@ -38,7 +38,7 @@ const stats = [
 
 export default function Landing() {
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground">
       <SEO
         path="/"
         title="Co-parenting App for Separated Parents"
@@ -65,7 +65,7 @@ export default function Landing() {
       </nav>
 
       {/* Hero */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-x-hidden overflow-y-visible">
         {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-purple-600 to-pink-600 opacity-90" />
         {/* Decorative blobs */}
