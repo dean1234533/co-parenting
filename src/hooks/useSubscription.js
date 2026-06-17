@@ -7,8 +7,8 @@ import { useAuth } from '@/lib/AuthContext';
  */
 export function useSubscription() {
   const { profile, isLoadingAuth } = useAuth();
-  const isPaid = profile?.subscriptionStatus === 'active';
-  return { isPaid, isLoading: isLoadingAuth };
+  const isPaid = profile?.isAdmin === true || profile?.subscriptionStatus === 'active';
+  return { isPaid, isAdmin: profile?.isAdmin === true, isLoading: isLoadingAuth };
 }
 
 /** Paid-only features — used for paywall checks */
