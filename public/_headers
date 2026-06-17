@@ -4,6 +4,11 @@
 
 /manifest.webmanifest
   Content-Type: application/manifest+json
+  Access-Control-Allow-Origin: *
+
+/icons/*
+  Cross-Origin-Resource-Policy: cross-origin
+  Access-Control-Allow-Origin: *
 
 /*
   X-Content-Type-Options: nosniff
