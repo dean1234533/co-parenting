@@ -7,12 +7,15 @@ import { applyPendingLink, updateUserProfile } from '@/lib/userProfile';
 
 const AuthContext = createContext();
 
+const cachedName = localStorage.getItem('jsgrwup_name');
+const cachedUid  = localStorage.getItem('jsgrwup_uid');
+
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(cachedUid ? { id: cachedUid, full_name: cachedName || 'User', email: '' } : null);
   const [profile, setProfile] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(!!cachedUid);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const [authChecked, setAuthChecked] = useState(false);
+  const [authChecked, setAuthChecked] = useState(!!cachedUid);
   const profileUnsubRef = useRef(null);
 
   const applyProfile = (uid, data) => {
@@ -54,14 +57,12 @@ export const AuthProvider = ({ children }) => {
 
       if (firstSnapshot) {
         firstSnapshot = false;
-        setUser({
-          id: firebaseUser.uid,
-          full_name: p.displayName || firebaseUser.email?.split('@')[0] || 'User',
-          email: firebaseUser.email,
-        });
+        const fullName = p.displayName || firebaseUser.email?.split('@')[0] || 'User';
+        setUser({ id: firebaseUser.uid, full_name: fullName, email: firebaseUser.email });
         setIsAuthenticated(true);
         setIsLoadingAuth(false);
         setAuthChecked(true);
+        localStorage.setItem('jsgrwup_uid', firebaseUser.uid);
       }
     }, (err) => {
       console.error('Profile listener error:', err);
@@ -103,6 +104,8 @@ export const AuthProvider = ({ children }) => {
         setFamilyId(null);
         setIsLoadingAuth(false);
         setAuthChecked(true);
+        localStorage.removeItem('jsgrwup_uid');
+        localStorage.removeItem('jsgrwup_name');
       }
     });
     return () => {
@@ -126,6 +129,7 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
     setFamilyId(null);
     localStorage.removeItem('jsgrwup_name');
+    localStorage.removeItem('jsgrwup_uid');
     if (shouldRedirect) window.location.href = '/login';
   };
 

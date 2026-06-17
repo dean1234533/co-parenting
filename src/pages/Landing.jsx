@@ -65,7 +65,7 @@ export default function Landing() {
       </nav>
 
       {/* Hero */}
-      <section className="relative [overflow-x:clip]">
+      <section className="relative [overflow-x:clip] min-h-[calc(100svh-64px)] flex flex-col justify-center">
         {/* Gradient background */}
         <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-purple-600 to-pink-600 opacity-90" />
         {/* Decorative blobs */}
@@ -73,7 +73,7 @@ export default function Landing() {
         <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-cyan-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '1s' }} />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style={{ animationDelay: '2s' }} />
 
-        <div className="relative max-w-6xl mx-auto px-6 py-24 text-center">
+        <div className="relative max-w-6xl mx-auto px-6 py-16 text-center w-full">
           <img src="/icons/icon-192x192.png" alt="Js-Grw-Up" className="w-28 h-28 rounded-3xl mx-auto mb-8 shadow-2xl shadow-black/30 ring-2 ring-white border-2 border-white bg-white object-cover" />
           <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold px-4 py-2 rounded-full mb-6 border border-white/30">
             <Heart className="h-3.5 w-3.5 text-pink-200" fill="currentColor" /> Built for the kids
