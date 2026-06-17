@@ -46,7 +46,7 @@ export default function Landing() {
       />
 
       {/* Nav */}
-      <nav className="sticky top-0 z-50 bg-gradient-to-r from-violet-700 via-purple-700 to-pink-700 shadow-lg shadow-violet-900/30">
+      <nav className="sticky top-0 z-50 bg-gradient-to-r from-violet-700 via-purple-700 to-pink-700 shadow-lg shadow-violet-900/30 border-b-2 border-white/40">
         <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
           <div className="flex items-center gap-3">
             <img src="/icons/icon-96x96.png" alt="Js-Grw-Up" className="w-9 h-9 rounded-xl ring-2 ring-white/30 shadow-md" />
