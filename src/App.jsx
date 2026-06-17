@@ -9,6 +9,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import OfflineIndicator from "@/components/OfflineIndicator";
 import InstallPrompt from "@/components/InstallPrompt";
 import ProfileSetup from "@/components/ProfileSetup";
+import UpdatePrompt from "@/components/UpdatePrompt";
 
 // Auth pages
 import Login from "@/pages/Login";
@@ -93,6 +94,7 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <OfflineIndicator />
+        <UpdatePrompt />
         <Router>
           <ScrollToTop />
           <AuthenticatedApp />
