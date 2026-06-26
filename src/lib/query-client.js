@@ -6,7 +6,7 @@ export const queryClientInstance = new QueryClient({
 			staleTime: 0,
 			refetchOnWindowFocus: true,
 			refetchOnReconnect: true,
-			refetchInterval: 15000,
+			refetchInterval: 5000,
 			retry: 1,
 		},
 	},

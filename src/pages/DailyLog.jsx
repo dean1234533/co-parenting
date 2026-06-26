@@ -183,7 +183,8 @@ export default function DailyLog() {
 
   const createMutation = useMutation({
     mutationFn: (data) => db.entities.DailyLog.create(data),
-    onSuccess: () => {
+    onSuccess: (newItem) => {
+      queryClient.setQueryData(["daily-logs"], (old) => [newItem, ...(old || [])]);
       queryClient.invalidateQueries({ queryKey: ["daily-logs"] });
       setOpen(false);
       setForm(defaultForm);

@@ -65,7 +65,8 @@ export default function CalendarPage() {
 
   const createMutation = useMutation({
     mutationFn: (data) => db.entities.CalendarEvent.create(data),
-    onSuccess: () => {
+    onSuccess: (newItem) => {
+      queryClient.setQueryData(["calendar-events"], (old) => [newItem, ...(old || [])]);
       queryClient.invalidateQueries({ queryKey: ["calendar-events"] });
       setOpen(false);
       setForm({ title: "", description: "", date: "", time: "", event_type: "", child_name: "" });

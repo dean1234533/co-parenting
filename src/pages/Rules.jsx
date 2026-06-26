@@ -36,7 +36,8 @@ export default function Rules() {
 
   const createMutation = useMutation({
     mutationFn: (data) => db.entities.CoParentingRule.create(data),
-    onSuccess: () => {
+    onSuccess: (newItem) => {
+      queryClient.setQueryData(["rules"], (old) => [newItem, ...(old || [])]);
       queryClient.invalidateQueries({ queryKey: ["rules"] });
       setOpen(false);
       setForm({ title: "", description: "", category: "general" });

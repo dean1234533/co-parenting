@@ -42,7 +42,8 @@ export default function Finances() {
 
   const createMutation = useMutation({
     mutationFn: (data) => db.entities.Expense.create(data),
-    onSuccess: () => {
+    onSuccess: (newItem) => {
+      queryClient.setQueryData(["expenses"], (old) => [newItem, ...(old || [])]);
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
       setOpen(false);
       setForm({ category: "", title: "", amount: "", date: "", paid_by: "", notes: "", recurring: false, recurring_frequency: "" });

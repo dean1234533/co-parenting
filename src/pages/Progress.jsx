@@ -55,7 +55,8 @@ export default function Progress() {
 
   const createMutation = useMutation({
     mutationFn: (data) => db.entities.ProgressEntry.create(data),
-    onSuccess: () => {
+    onSuccess: (newItem) => {
+      queryClient.setQueryData(["progress"], (old) => [newItem, ...(old || [])]);
       queryClient.invalidateQueries({ queryKey: ["progress"] });
       setOpen(false);
       setForm({ child_name: "", category: "", title: "", description: "", date: "", photo_urls: [] });

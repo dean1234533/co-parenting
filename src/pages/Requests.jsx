@@ -64,7 +64,8 @@ export default function Requests() {
 
   const createMutation = useMutation({
     mutationFn: (data) => db.entities.Request.create(data),
-    onSuccess: () => {
+    onSuccess: (newItem) => {
+      queryClient.setQueryData(["requests"], (old) => [newItem, ...(old || [])]);
       queryClient.invalidateQueries({ queryKey: ["requests"] });
       setOpen(false);
       setForm({ type: "", title: "", description: "", date_from: "", date_to: "" });

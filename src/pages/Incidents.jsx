@@ -43,7 +43,8 @@ export default function Incidents() {
 
   const createMutation = useMutation({
     mutationFn: (data) => db.entities.IncidentReport.create(data),
-    onSuccess: () => {
+    onSuccess: (newItem) => {
+      queryClient.setQueryData(["incidents"], (old) => [newItem, ...(old || [])]);
       queryClient.invalidateQueries({ queryKey: ["incidents"] });
       setOpen(false);
       setForm({ child_name: "", incident_date: "", description: "", injury_type: "", severity: "minor", action_taken: "", medical_attention: false, photo_urls: [] });
