@@ -16,8 +16,12 @@ let currentFamilyId = null;
 export const setFamilyId = (id) => { currentFamilyId = id; };
 export const getFamilyId = () => currentFamilyId;
 
+const collectionNameOverrides = {
+  ProgressEntry: 'progressEntries',
+};
+
 const toCollectionName = (name) =>
-  name.charAt(0).toLowerCase() + name.slice(1) + 's';
+  collectionNameOverrides[name] || (name.charAt(0).toLowerCase() + name.slice(1) + 's');
 
 const parseSortField = (sortField) => {
   if (!sortField) return null;
