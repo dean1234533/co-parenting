@@ -10,6 +10,7 @@ export default function AcceptInvite() {
   const { token } = useParams();
   const navigate = useNavigate();
   const { isAuthenticated, isLoadingAuth, refreshProfile } = useAuth();
+  const autoAccept = new URLSearchParams(window.location.search).get('auto') === '1';
 
   const [invite, setInvite] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,6 +29,12 @@ export default function AcceptInvite() {
       .catch(() => setError('This invite link is invalid or has expired.'))
       .finally(() => setLoading(false));
   }, [token, isLoadingAuth]);
+
+  // Auto-accept when user just registered/signed-in via the invite link
+  useEffect(() => {
+    if (!autoAccept || loading || isLoadingAuth || !isAuthenticated || !invite || done || accepting) return;
+    handleAccept();
+  }, [autoAccept, loading, isLoadingAuth, isAuthenticated, invite, done, accepting]);
 
   const handleAccept = async () => {
     setAccepting(true);
@@ -91,10 +98,10 @@ export default function AcceptInvite() {
             <p className="text-sm text-muted-foreground text-center">
               Sign in or create an account first, then come back to this link to connect.
             </p>
-            <Button className="w-full" onClick={() => navigate(`/login?next=/invite/${token}`)}>
+            <Button className="w-full" onClick={() => navigate(`/login?next=${encodeURIComponent(`/invite/${token}?auto=1`)}`)}>
               Sign in
             </Button>
-            <Button variant="outline" className="w-full" onClick={() => navigate(`/register?next=/invite/${token}`)}>
+            <Button variant="outline" className="w-full" onClick={() => navigate(`/register?next=${encodeURIComponent(`/invite/${token}?auto=1`)}`)}>
               Create account
             </Button>
           </div>
