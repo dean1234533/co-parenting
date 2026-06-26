@@ -128,8 +128,8 @@ export default function Settings() {
 
 
 
-      {/* Google Calendar */}
-      {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+      {/* Google Calendar — admin only until OAuth verified */}
+      {import.meta.env.VITE_GOOGLE_CLIENT_ID && profile?.isAdmin === true && (
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
