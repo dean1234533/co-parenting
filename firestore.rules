@@ -2,45 +2,27 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-
-    function isOwner(uid) {
-      return request.auth.uid == uid;
-    }
-
+    function isAuthenticated() { return request.auth != null; }
+    function isOwner(uid) { return request.auth.uid == uid; }
     function getUserData() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
-
     function inSameFamily(familyId) {
       return getUserData().familyId == familyId;
     }
 
-    // Fields only the server (service account) may write
-    function isServerOnlyField(key) {
-      return key in ['subscriptionStatus', 'subscriptionId', 'customerId', 'currentPeriodEnd', 'isAdmin'];
-    }
-
-    // User profiles — only the owner can read/write their own
     match /users/{uid} {
       allow read: if isAuthenticated() && (isOwner(uid) || getUserData().partnerId == uid);
       allow create: if isAuthenticated() && isOwner(uid);
-      // Clients cannot touch payment or admin fields — only the service account can
+      // Clients cannot touch payment or admin fields — only the server can
       allow update: if isAuthenticated() && isOwner(uid)
         && !request.resource.data.diff(resource.data).affectedKeys()
             .hasAny(['subscriptionStatus', 'subscriptionId', 'customerId', 'currentPeriodEnd', 'isAdmin']);
     }
-
-    // Pending links — anyone authenticated can write (to leave a link for another user)
-    // but only the owner can read their own pending link
     match /pendingLinks/{uid} {
       allow read, delete: if isAuthenticated() && isOwner(uid);
       allow write: if isAuthenticated();
     }
-
-    // Families — readable and writable only by members
     match /families/{familyId} {
       allow read: if isAuthenticated() && (
         resource.data.member1Id == request.auth.uid ||
@@ -52,25 +34,15 @@ service cloud.firestore {
         resource.data.member2Id == request.auth.uid
       );
     }
-
-    // Invites — anyone with the token URL can read (needed to show invite preview before login)
     match /invites/{token} {
       allow read: if true;
       allow create: if isAuthenticated();
-      // Any authenticated user can update (needed for invite acceptance flow)
       allow update: if isAuthenticated();
-      allow delete: if isAuthenticated() && resource.data.createdBy == request.auth.uid;
     }
-
-    // FCM tokens — owner can write; owner or linked partner can read
-    // Partner read access is needed so the Cloudflare notify function can fetch
-    // the recipient's token using the sender's verified ID token
     match /fcmTokens/{uid} {
       allow read: if isAuthenticated() && (isOwner(uid) || getUserData().partnerId == uid);
       allow write: if isAuthenticated() && isOwner(uid);
     }
-
-    // All shared family collections — scoped to familyId
     match /chatMessages/{docId} {
       allow read, write: if isAuthenticated() && inSameFamily(resource.data.familyId);
       allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId);
@@ -100,10 +72,6 @@ service cloud.firestore {
       allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId);
     }
     match /coParentingRules/{docId} {
-      allow read, write: if isAuthenticated() && inSameFamily(resource.data.familyId);
-      allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId);
-    }
-    match /children/{docId} {
       allow read, write: if isAuthenticated() && inSameFamily(resource.data.familyId);
       allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId);
     }
