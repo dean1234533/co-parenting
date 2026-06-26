@@ -24,7 +24,7 @@ export default function ExportPDF() {
 
   const { data: messages = [] } = useQuery({
     queryKey: ["chat-messages"],
-    queryFn: () => db.entities.ChatMessage.list("-created_date", 200),
+    queryFn: () => db.entities.ChatMessage.list("created_date", 200),
   });
   const { data: requests = [] } = useQuery({
     queryKey: ["requests"],

@@ -9,6 +9,14 @@
       ]
     },
     {
+      "collectionGroup": "chatMessages",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "familyId", "order": "ASCENDING" },
+        { "fieldPath": "created_date", "order": "DESCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "calendarEvents",
       "queryScope": "COLLECTION",
       "fields": [
