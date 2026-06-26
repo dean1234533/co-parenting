@@ -43,7 +43,7 @@ function GCalIcon({ className }) {
 
 export default function CalendarPage() {
   const { profile } = useAuth();
-  const canUseGCal = !!import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const canUseGCal = profile?.isAdmin === true;
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [open, setOpen] = useState(false);
