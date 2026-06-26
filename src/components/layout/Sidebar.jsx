@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link, useLocation } from "react-router-dom";
 import {
   MessageSquare, CalendarDays, AlertTriangle, GraduationCap,
@@ -42,13 +43,15 @@ export default function Sidebar() {
   const [unlinking, setUnlinking] = useState(false);
   const { permission, requestPermission } = usePushNotifications();
   const { profile } = useAuth();
+  const queryClient = useQueryClient();
 
   const handleUnlink = async () => {
     if (!profile?.partnerId) return;
     setUnlinking(true);
     try {
       await unlinkPartners(auth.currentUser.uid, profile.partnerId, profile.familyId);
-      // Profile updates automatically via onSnapshot in AuthContext
+      // Clear all cached data so shared info disappears immediately
+      queryClient.clear();
     } catch (err) {
       console.error('Unlink error:', err);
     } finally {
