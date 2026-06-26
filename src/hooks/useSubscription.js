@@ -23,6 +23,7 @@ export function useSubscription() {
 
   const isPaid = profile?.isAdmin === true
     || profile?.subscriptionStatus === 'active'
+    || partnerProfile?.isAdmin === true
     || partnerProfile?.subscriptionStatus === 'active';
 
   return { isPaid, isAdmin: profile?.isAdmin === true, isLoading: isLoadingAuth || (!!profile?.partnerId && partnerLoading) };
