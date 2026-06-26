@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   MessageSquare, CalendarDays, AlertTriangle, GraduationCap,
   PoundSterling, Receipt, FileText, BookOpen, ClipboardCheck,
-  Home, Menu, X, ChevronRight, Heart, NotebookPen, Bell, BellOff, BellRing, UserPlus, Unlink, Settings, Sparkles, HelpCircle
+  Home, Menu, X, ChevronRight, Heart, NotebookPen, Bell, BellOff, BellRing, UserPlus, Settings, Sparkles, HelpCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,7 +16,6 @@ import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from '@/lib/AuthContext';
 import { useSubscription } from '@/hooks/useSubscription';
 import InvitePartner from '@/components/InvitePartner';
-import { unlinkPartners } from '@/lib/userProfile';
 import { auth } from '@/lib/firebase';
 
 const navItems = [
@@ -37,25 +36,9 @@ export default function Sidebar() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
-  const [showUnlinkConfirm, setShowUnlinkConfirm] = useState(false);
   const { isPaid } = useSubscription();
-  const [unlinking, setUnlinking] = useState(false);
   const { permission, requestPermission } = usePushNotifications();
   const { profile } = useAuth();
-
-  const handleUnlink = async () => {
-    if (!profile?.partnerId) return;
-    setUnlinking(true);
-    try {
-      await unlinkPartners(auth.currentUser.uid, profile.partnerId, profile.familyId);
-      window.location.reload();
-    } catch (err) {
-      console.error('Unlink error:', err);
-    } finally {
-      setUnlinking(false);
-      setShowUnlinkConfirm(false);
-    }
-  };
 
   return (
     <>
@@ -136,18 +119,9 @@ export default function Sidebar() {
             </button>
           )}
           {profile?.partnerName && (
-            <div className="flex items-center justify-between px-3 py-2">
-              <div className="flex items-center gap-2 text-xs text-sidebar-foreground/50">
-                <Heart className="h-4 w-4 text-pink-400" />
-                Linked with {profile.partnerName}
-              </div>
-              <button
-                onClick={() => setShowUnlinkConfirm(true)}
-                className="text-xs text-sidebar-foreground/40 hover:text-destructive transition-colors flex items-center gap-1"
-                title="Unlink accounts"
-              >
-                <Unlink className="h-3.5 w-3.5" />
-              </button>
+            <div className="flex items-center gap-2 px-3 py-2 text-xs text-sidebar-foreground/50">
+              <Heart className="h-4 w-4 text-pink-400" />
+              Linked with {profile.partnerName}
             </div>
           )}
           {/* Push notification toggle */}
@@ -207,26 +181,6 @@ export default function Sidebar() {
       </aside>
       {showInvite && <InvitePartner onClose={() => setShowInvite(false)} />}
 
-      <AlertDialog open={showUnlinkConfirm} onOpenChange={setShowUnlinkConfirm}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Unlink from {profile?.partnerName}?</AlertDialogTitle>
-            <AlertDialogDescription>
-              You and {profile?.partnerName} will no longer share data. Your existing records will stay but won't be visible to each other. This cannot be undone — you'd need to send a new invite to re-link.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={unlinking}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-              onClick={handleUnlink}
-              disabled={unlinking}
-            >
-              {unlinking ? 'Unlinking…' : 'Unlink Accounts'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }
