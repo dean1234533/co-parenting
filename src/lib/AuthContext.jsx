@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useRef } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { auth, firestore } from '@/lib/firebase';
 import { setFamilyId } from '@/api/db';
 import { applyPendingLink, updateUserProfile } from '@/lib/userProfile';
@@ -77,7 +77,7 @@ export const AuthProvider = ({ children }) => {
       const { familyId, partnerId, partnerName } = snap.data();
       try {
         await updateUserProfile(firebaseUser.uid, { familyId, partnerId, partnerName });
-        // profile onSnapshot will fire with the new values automatically
+        await deleteDoc(pendingRef);
       } catch {
         // if update fails, still apply locally so current session works
         applyProfile(firebaseUser.uid, {
