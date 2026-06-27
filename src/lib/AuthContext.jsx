@@ -3,7 +3,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, onSnapshot, setDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { auth, firestore } from '@/lib/firebase';
 import { setFamilyId } from '@/api/db';
-import { applyPendingLink, updateUserProfile } from '@/lib/userProfile';
+import { applyPendingLink } from '@/lib/userProfile';
 
 const AuthContext = createContext();
 
@@ -84,12 +84,13 @@ export const AuthProvider = ({ children }) => {
       if (!snap.exists()) return;
       const { familyId, partnerId, partnerName } = snap.data();
       try {
-        await updateUserProfile(firebaseUser.uid, { familyId, partnerId, partnerName });
+        await setDoc(doc(firestore, 'users', firebaseUser.uid), { familyId, partnerId, partnerName }, { merge: true });
         await deleteDoc(pendingRef);
       } catch {
-        // if update fails, still apply locally so current session works
+        // Apply locally so current session works even if the Firestore write failed
+        const profileSnap = await getDoc(profileRef);
         applyProfile(firebaseUser.uid, {
-          ...(await getDoc(profileRef)).data(),
+          ...(profileSnap.exists() ? profileSnap.data() : {}),
           familyId, partnerId, partnerName,
         });
       }
