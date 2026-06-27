@@ -1,4 +1,5 @@
 import db from '@/api/db';
+import { sendPartnerNotification } from '@/lib/notify';
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -47,6 +48,7 @@ export default function Finances() {
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
       setOpen(false);
       setForm({ category: "", title: "", amount: "", date: "", paid_by: "", notes: "", recurring: false, recurring_frequency: "" });
+      sendPartnerNotification({ title: 'New expense added', body: `${currentUser?.full_name || 'Your co-parent'} added "${newItem.title}"${newItem.amount ? ` — £${newItem.amount}` : ''}` });
     },
   });
 

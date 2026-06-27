@@ -1,4 +1,5 @@
 import db from '@/api/db';
+import { sendPartnerNotification } from '@/lib/notify';
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -39,11 +40,12 @@ export default function Receipts() {
 
   const createMutation = useMutation({
     mutationFn: (data) => db.entities.Expense.create(data),
-    onSuccess: () => {
+    onSuccess: (newItem) => {
       queryClient.invalidateQueries({ queryKey: ["receipts"] });
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
       setOpen(false);
       setForm({ title: "", amount: "", date: "", category: "", receipt_url: "", paid_by: "" });
+      sendPartnerNotification({ title: 'New receipt uploaded', body: `${currentUser?.full_name || 'Your co-parent'} uploaded a receipt${newItem?.title ? ` for "${newItem.title}"` : ''}` });
     },
   });
 

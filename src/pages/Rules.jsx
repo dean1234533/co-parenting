@@ -1,4 +1,5 @@
 import db from '@/api/db';
+import { sendPartnerNotification } from '@/lib/notify';
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -41,6 +42,7 @@ export default function Rules() {
       queryClient.invalidateQueries({ queryKey: ["rules"] });
       setOpen(false);
       setForm({ title: "", description: "", category: "general" });
+      sendPartnerNotification({ title: 'New co-parenting rule', body: `A new rule was added: "${newItem.title}"` });
     },
   });
 

@@ -1,4 +1,5 @@
 import db from '@/api/db';
+import { sendPartnerNotification } from '@/lib/notify';
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -189,6 +190,7 @@ export default function DailyLog() {
       setOpen(false);
       setForm(defaultForm);
       setMedicines([]);
+      sendPartnerNotification({ title: 'New daily log', body: `${currentUser?.full_name || 'Your co-parent'} added a daily log${newItem.child_name ? ` for ${newItem.child_name}` : ''}` });
     },
   });
 

@@ -1,4 +1,5 @@
 import db from '@/api/db';
+import { sendPartnerNotification } from '@/lib/notify';
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -60,6 +61,7 @@ export default function Progress() {
       queryClient.invalidateQueries({ queryKey: ["progress"] });
       setOpen(false);
       setForm({ child_name: "", category: "", title: "", description: "", date: "", photo_urls: [] });
+      sendPartnerNotification({ title: 'New progress entry', body: `${currentUser?.full_name || 'Your co-parent'} logged a milestone${newItem.child_name ? ` for ${newItem.child_name}` : ''}: "${newItem.title}"` });
     },
   });
 

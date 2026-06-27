@@ -1,5 +1,6 @@
 import db from '@/api/db';
 import { sendToGoogleCalendar } from '@/lib/googleCalendar';
+import { sendPartnerNotification } from '@/lib/notify';
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -70,6 +71,7 @@ export default function CalendarPage() {
       queryClient.invalidateQueries({ queryKey: ["calendar-events"] });
       setOpen(false);
       setForm({ title: "", description: "", date: "", time: "", event_type: "", child_name: "" });
+      sendPartnerNotification({ title: 'New calendar event', body: `${currentUser?.full_name || 'Your co-parent'} added "${newItem.title}"` });
     },
   });
 

@@ -1,4 +1,5 @@
 import db from '@/api/db';
+import { sendPartnerNotification } from '@/lib/notify';
 
 import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -48,6 +49,7 @@ export default function Incidents() {
       queryClient.invalidateQueries({ queryKey: ["incidents"] });
       setOpen(false);
       setForm({ child_name: "", incident_date: "", description: "", injury_type: "", severity: "minor", action_taken: "", medical_attention: false, photo_urls: [] });
+      sendPartnerNotification({ title: 'New incident report', body: `${currentUser?.full_name || 'Your co-parent'} logged an incident${newItem.child_name ? ` for ${newItem.child_name}` : ''}` });
     },
   });
 
