@@ -43,13 +43,16 @@ export async function getInvite(token) {
 
 export async function acceptInvite(token) {
   const user = auth.currentUser;
+  console.log('[acceptInvite] token=%s uid=%s', token, user?.uid);
   if (!user) throw new Error('Not authenticated');
 
   const invite = await getInvite(token);
+  console.log('[acceptInvite] invite=', invite);
   if (!invite) throw new Error('Invite not found or has expired. Ask your co-parent to send a new invite link.');
   if (invite.createdBy === user.uid) throw new Error('You cannot accept your own invite');
 
   const myProfile = await getUserProfile(user.uid);
+  console.log('[acceptInvite] myProfile=', myProfile);
   if (!myProfile) throw new Error('Your profile is not set up yet. Please try again in a moment.');
 
   // Block only if already linked to a *different* co-parent — allow re-linking to the same person
@@ -63,6 +66,7 @@ export async function acceptInvite(token) {
     invite.createdByName,
     myProfile.displayName
   );
+  console.log('[acceptInvite] ✅ linkPartners done familyId=%s', familyId);
 
   // Mark invite as accepted (or update if already accepted by this user)
   await updateDoc(doc(firestore, 'invites', token), {
@@ -71,5 +75,6 @@ export async function acceptInvite(token) {
     acceptedAt: new Date().toISOString(),
   });
 
+  console.log('[acceptInvite] ✅ done');
   return familyId;
 }

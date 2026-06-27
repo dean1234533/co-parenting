@@ -36,12 +36,14 @@ export const AuthProvider = ({ children }) => {
     let firstSnapshot = true;
 
     const unsub = onSnapshot(profileRef, async (snap) => {
+      console.log('[Auth] profile snapshot uid=%s exists=%s firstSnapshot=%s', firebaseUser.uid, snap.exists(), firstSnapshot);
       if (!snap.exists()) {
         // Only auto-create profile for brand-new sign-ins (within 5 min of last sign-in).
         // If the profile was deleted by an admin for an established account, sign out instead.
         const lastSignIn = new Date(firebaseUser.metadata.lastSignInTime).getTime();
         const isRecentSignIn = Date.now() - lastSignIn < 5 * 60 * 1000;
         if (!isRecentSignIn) {
+          console.log('[Auth] profile missing + stale session → signing out');
           await signOut(auth);
           return;
         }
@@ -49,7 +51,11 @@ export const AuthProvider = ({ children }) => {
         // Register will call createUserProfile with the real name, which fires a
         // second snapshot and unblocks loading. Only auto-create for OAuth sign-ins
         // where displayName is already populated (e.g. Google).
-        if (!firebaseUser.displayName) return;
+        if (!firebaseUser.displayName) {
+          console.log('[Auth] profile missing, no displayName yet — waiting for Register to create it');
+          return;
+        }
+        console.log('[Auth] auto-creating profile for OAuth user displayName=%s', firebaseUser.displayName);
         const newProfile = {
           displayName: firebaseUser.displayName,
           email: firebaseUser.email,
@@ -63,6 +69,7 @@ export const AuthProvider = ({ children }) => {
       }
 
       const p = applyProfile(firebaseUser.uid, snap.data());
+      console.log('[Auth] profile applied displayName=%s familyId=%s partnerId=%s', p.displayName, p.familyId, p.partnerId);
 
       if (p.displayName && !p.displayName.includes('@')) {
         localStorage.setItem('jsgrwup_name', p.displayName);
@@ -76,9 +83,10 @@ export const AuthProvider = ({ children }) => {
         setIsLoadingAuth(false);
         setAuthChecked(true);
         localStorage.setItem('jsgrwup_uid', firebaseUser.uid);
+        console.log('[Auth] ✅ auth resolved isAuthenticated=true');
       }
     }, (err) => {
-      console.error('Profile listener error:', err);
+      console.error('[Auth] profile listener error:', err);
       setIsLoadingAuth(false);
       setAuthChecked(true);
     });
