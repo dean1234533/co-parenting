@@ -1,9 +1,20 @@
 import { useState, useEffect } from 'react';
 import { getToken, onMessage } from 'firebase/messaging';
 import { doc, setDoc } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 import { auth, firestore, messagingPromise } from '@/lib/firebase';
 
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY;
+
+// Resolves with the current Firebase user, waiting for auth to initialize if needed
+function waitForUser() {
+  return new Promise((resolve) => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      unsub();
+      resolve(user);
+    });
+  });
+}
 
 export function usePushNotifications() {
   const [permission, setPermission] = useState(
@@ -14,13 +25,16 @@ export function usePushNotifications() {
 
   // Save FCM token to Firestore so server can target this device
   const saveToken = async (token) => {
-    if (!auth.currentUser || !token) return;
+    if (!token) return;
+    // Wait for auth to initialize before saving — avoids race condition on mount
+    const user = auth.currentUser || await waitForUser();
+    if (!user) return;
     try {
       await setDoc(
-        doc(firestore, 'fcmTokens', auth.currentUser.uid),
+        doc(firestore, 'fcmTokens', user.uid),
         {
           token,
-          uid: auth.currentUser.uid,
+          uid: user.uid,
           updatedAt: new Date().toISOString(),
           platform: /iphone|ipad|ipod|android/i.test(navigator.userAgent) ? 'mobile' : 'desktop',
         },
