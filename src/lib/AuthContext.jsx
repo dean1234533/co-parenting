@@ -37,6 +37,14 @@ export const AuthProvider = ({ children }) => {
 
     const unsub = onSnapshot(profileRef, async (snap) => {
       if (!snap.exists()) {
+        // Only auto-create profile for brand-new sign-ins (within 5 min of last sign-in).
+        // If the profile was deleted by an admin for an established account, sign out instead.
+        const lastSignIn = new Date(firebaseUser.metadata.lastSignInTime).getTime();
+        const isRecentSignIn = Date.now() - lastSignIn < 5 * 60 * 1000;
+        if (!isRecentSignIn) {
+          await signOut(auth);
+          return;
+        }
         const newProfile = {
           displayName: firebaseUser.displayName || '',
           email: firebaseUser.email,
