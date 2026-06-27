@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Download, Share, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/lib/AuthContext';
 
 const SESSION_KEY = 'jsgrwup-install-dismissed';
 
@@ -17,12 +18,14 @@ function isInStandaloneMode() {
 }
 
 export default function InstallPrompt() {
+  const { isAuthenticated } = useAuth();
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [visible, setVisible] = useState(false);
   const [ios, setIos] = useState(false);
 
   useEffect(() => {
-    // Don't show if already installed or dismissed this session
+    // Don't show if not signed in, already installed, or dismissed this session
+    if (!isAuthenticated) return;
     if (isInStandaloneMode()) return;
     if (sessionStorage.getItem(SESSION_KEY)) return;
 
