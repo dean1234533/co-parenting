@@ -19,7 +19,6 @@ function isInStandaloneMode() {
 
 export default function InstallPrompt() {
   const { isAuthenticated } = useAuth();
-  const { pathname } = useLocation();
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [visible, setVisible] = useState(false);
   const [ios, setIos] = useState(false);
