@@ -3,6 +3,7 @@ import { X, Download, Share, Smartphone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/lib/AuthContext';
+import { useLocation } from 'react-router-dom';
 
 const SESSION_KEY = 'jsgrwup-install-dismissed';
 
@@ -17,15 +18,20 @@ function isInStandaloneMode() {
   );
 }
 
+// Pages where we never want to interrupt with an install prompt
+const AUTH_PATHS = ['/login', '/register', '/forgot-password', '/reset-password'];
+
 export default function InstallPrompt() {
   const { isAuthenticated } = useAuth();
+  const { pathname } = useLocation();
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [visible, setVisible] = useState(false);
   const [ios, setIos] = useState(false);
 
   useEffect(() => {
-    // Don't show if not signed in, already installed, or dismissed this session
-    if (!isAuthenticated) return;
+    // Don't show on login/register/invite pages, or if already installed or dismissed
+    const isAuthPage = AUTH_PATHS.some((p) => pathname.startsWith(p)) || pathname.startsWith('/invite/');
+    if (!isAuthenticated && isAuthPage) return;
     if (isInStandaloneMode()) return;
     if (sessionStorage.getItem(SESSION_KEY)) return;
 
@@ -43,7 +49,7 @@ export default function InstallPrompt() {
     };
     window.addEventListener('beforeinstallprompt', handler);
     return () => window.removeEventListener('beforeinstallprompt', handler);
-  }, []);
+  }, [isAuthenticated, pathname]);
 
   const handleInstall = async () => {
     if (!deferredPrompt) return;
