@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useAuth } from '@/lib/AuthContext';
 import { MessageCircle, CalendarDays, FileText, ShieldCheck, Receipt, BookOpen, ChevronRight, Heart, Lock, Users, Check, Sparkles, Star } from 'lucide-react';
 import SEO from '@/components/SEO';
 
@@ -37,6 +39,16 @@ const stats = [
 ];
 
 export default function Landing() {
+  const { isAuthenticated, isLoadingAuth } = useAuth();
+  const navigate = useNavigate();
+
+  // Once auth has resolved and user is not signed in, go straight to login
+  useEffect(() => {
+    if (!isLoadingAuth && !isAuthenticated) {
+      navigate('/login', { replace: true });
+    }
+  }, [isLoadingAuth, isAuthenticated]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SEO
