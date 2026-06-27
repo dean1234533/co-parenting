@@ -46,9 +46,12 @@ export async function acceptInvite(token) {
   if (!user) throw new Error('Not authenticated');
 
   const invite = await getInvite(token);
-  if (!invite) throw new Error('Invite not found');
-  if (invite.status !== 'pending') throw new Error('Invite already used or expired');
+  if (!invite) throw new Error('Invite not found or has expired. Ask your co-parent to send a new invite link.');
   if (invite.createdBy === user.uid) throw new Error('You cannot accept your own invite');
+  // Allow re-accepting a previously accepted invite (e.g. after account reset or re-linking)
+  if (invite.status !== 'pending' && invite.acceptedBy !== user.uid) {
+    throw new Error('This invite has already been used by someone else. Ask your co-parent to send a new invite link.');
+  }
 
   const myProfile = await getUserProfile(user.uid);
   if (!myProfile) throw new Error('Your profile is not set up yet');

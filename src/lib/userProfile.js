@@ -45,11 +45,12 @@ export async function linkPartners(inviterUid, acceptorUid, inviterName, accepto
   });
 
   // Update acceptor's OWN doc (they own it — always allowed)
-  await updateDoc(doc(firestore, 'users', acceptorUid), {
+  // Use setDoc+merge so it works even if the profile doc is brand-new
+  await setDoc(doc(firestore, 'users', acceptorUid), {
     familyId,
     partnerId: inviterUid,
     partnerName: inviterName,
-  });
+  }, { merge: true });
 
   // Leave a pending link for the inviter — they apply it to their own doc on next load
   // (avoids needing cross-user write permissions)
