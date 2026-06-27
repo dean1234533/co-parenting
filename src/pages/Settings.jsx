@@ -58,25 +58,36 @@ export default function Settings() {
     setError('');
     try {
       const user = auth.currentUser;
+      if (!user) throw new Error('Not signed in');
 
       // Leave a pendingLink for the partner so they get unlinked on next load.
-      // pendingLinks allows writes from any authenticated user.
       if (profile?.partnerId) {
-        await setDoc(doc(firestore, 'pendingLinks', profile.partnerId), {
-          familyId: profile.partnerId,
-          partnerId: null,
-          partnerName: null,
-          linkedAt: new Date().toISOString(),
-        });
+        try {
+          await setDoc(doc(firestore, 'pendingLinks', profile.partnerId), {
+            familyId: profile.partnerId,
+            partnerId: null,
+            partnerName: null,
+            linkedAt: new Date().toISOString(),
+          });
+        } catch {
+          // Non-fatal — partner sees they're unlinked when inviter profile is gone
+        }
       }
 
-      // Get a fresh token for the server call
       const idToken = await user.getIdToken(true);
 
-      const res = await fetch('/api/delete-account', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${idToken}`, 'Content-Type': 'application/json' },
-      });
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      let res;
+      try {
+        res = await fetch('/api/delete-account', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${idToken}`, 'Content-Type': 'application/json' },
+          signal: controller.signal,
+        });
+      } finally {
+        clearTimeout(timeoutId);
+      }
 
       const body = await res.json().catch(() => ({}));
 
@@ -84,13 +95,16 @@ export default function Settings() {
         throw new Error(body.error || `Server error ${res.status}`);
       }
 
-      // Clear any locally cached identity so the login page doesn't say "Welcome back"
       localStorage.clear();
       sessionStorage.clear();
       window.location.href = '/register?deleted=true';
     } catch (err) {
       console.error('Delete account error:', err);
-      setError(err.message || 'Failed to delete account. Please try again.');
+      setError(
+        err.name === 'AbortError'
+          ? 'Request timed out. Please try again.'
+          : (err.message || 'Failed to delete account. Please try again.')
+      );
     } finally {
       setDeleting(false);
     }
@@ -292,13 +306,16 @@ export default function Settings() {
           {error && <p className="text-sm text-destructive px-1">{error}</p>}
           <AlertDialogFooter>
             <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            <Button
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 gap-2"
               onClick={handleDeleteAccount}
               disabled={deleting}
             >
-              {deleting ? 'Deleting…' : 'Delete Account'}
-            </AlertDialogAction>
+              {deleting
+                ? <><Loader2 className="h-4 w-4 animate-spin" /> Deleting…</>
+                : 'Delete Account'
+              }
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
