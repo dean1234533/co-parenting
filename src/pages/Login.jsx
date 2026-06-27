@@ -1,7 +1,7 @@
 import db from '@/api/db';
 
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import { LogIn, Mail, Lock, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 
 export default function Login() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -23,8 +24,18 @@ export default function Login() {
     setLoading(true);
     try {
       await db.auth.loginViaEmailPassword(email, password);
+
       const next = new URLSearchParams(window.location.search).get('next');
-      window.location.href = next || "/";
+      const inviteMatch = next?.match(/\/invite\/([^?/]+)/);
+      const inviteToken = inviteMatch?.[1] || localStorage.getItem('pendingInviteToken');
+
+      if (inviteToken) {
+        localStorage.removeItem('pendingInviteToken');
+        navigate(`/invite/${inviteToken}`, { replace: true });
+        return;
+      }
+
+      navigate(next || '/', { replace: true });
     } catch (err) {
       setError(err.message || "Invalid email or password");
     } finally {

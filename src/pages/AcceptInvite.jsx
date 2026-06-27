@@ -100,10 +100,16 @@ export default function AcceptInvite() {
             <p className="text-sm text-muted-foreground text-center">
               Sign in or create an account first, then come back to this link to connect.
             </p>
-            <Button className="w-full" onClick={() => navigate(`/login?next=${encodeURIComponent(`/invite/${token}?auto=1`)}`)}>
+            <Button className="w-full" onClick={() => {
+              localStorage.setItem('pendingInviteToken', token);
+              navigate(`/login?next=${encodeURIComponent(`/invite/${token}?auto=1`)}`);
+            }}>
               Sign in
             </Button>
-            <Button variant="outline" className="w-full" onClick={() => navigate(`/register?next=${encodeURIComponent(`/invite/${token}?auto=1`)}`)}>
+            <Button variant="outline" className="w-full" onClick={() => {
+              localStorage.setItem('pendingInviteToken', token);
+              navigate(`/register?next=${encodeURIComponent(`/invite/${token}?auto=1`)}`);
+            }}>
               Create account
             </Button>
           </div>

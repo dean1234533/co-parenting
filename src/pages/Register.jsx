@@ -38,7 +38,19 @@ export default function Register() {
           email,
         });
       }
+
+      // If user arrived via an invite link, send them to the invite page to confirm linking.
+      // They are now authenticated so they'll see "Accept & Link Accounts" and click it.
       const next = new URLSearchParams(window.location.search).get('next');
+      const inviteMatch = next?.match(/\/invite\/([^?/]+)/);
+      const inviteToken = inviteMatch?.[1] || localStorage.getItem('pendingInviteToken');
+
+      if (inviteToken) {
+        localStorage.removeItem('pendingInviteToken');
+        navigate(`/invite/${inviteToken}`, { replace: true });
+        return;
+      }
+
       navigate(next || '/dashboard', { replace: true });
     } catch (err) {
       setError(err.message || "Registration failed");
