@@ -1,10 +1,9 @@
 /**
  * Cloudflare Pages Function — POST /api/delete-account
  *
- * Deletes a Firebase Auth user + their Firestore documents using a service
- * account, bypassing the client-side "requires-recent-login" restriction.
+ * Deletes the Firebase Auth user + ALL their Firestore data using a service account.
  *
- * Required env vars (same set as /api/notify):
+ * Required env vars:
  *   VITE_FIREBASE_API_KEY, VITE_FIREBASE_PROJECT_ID,
  *   FIREBASE_SA_EMAIL, FIREBASE_SA_PRIVATE_KEY
  */
@@ -19,7 +18,6 @@ async function getAdminToken(saEmail, privateKeyPem) {
   const header  = b64url({ alg: 'RS256', typ: 'JWT' });
   const payload = b64url({
     iss: saEmail,
-    // Both scopes needed — cloud-platform covers Identity Toolkit admin ops
     scope: 'https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/identitytoolkit',
     aud: 'https://oauth2.googleapis.com/token',
     iat: now,
@@ -57,6 +55,76 @@ async function getAdminToken(saEmail, privateKeyPem) {
   return access_token;
 }
 
+// Query a collection for docs matching familyId and delete them all
+async function deleteByFamilyId(fsBase, adminToken, collectionId, familyId) {
+  const res = await fetch(`${fsBase}:runQuery`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${adminToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      structuredQuery: {
+        from: [{ collectionId }],
+        where: {
+          fieldFilter: {
+            field: { fieldPath: 'familyId' },
+            op: 'EQUAL',
+            value: { stringValue: familyId },
+          },
+        },
+        limit: 500,
+      },
+    }),
+  });
+
+  const results = await res.json();
+  if (!Array.isArray(results)) return;
+
+  await Promise.all(
+    results
+      .filter((r) => r.document?.name)
+      .map((r) =>
+        fetch(`https://firestore.googleapis.com/v1/${r.document.name}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${adminToken}` },
+        })
+      )
+  );
+}
+
+// Delete all invites created by this user
+async function deleteUserInvites(fsBase, adminToken, uid) {
+  const res = await fetch(`${fsBase}:runQuery`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${adminToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      structuredQuery: {
+        from: [{ collectionId: 'invites' }],
+        where: {
+          fieldFilter: {
+            field: { fieldPath: 'createdBy' },
+            op: 'EQUAL',
+            value: { stringValue: uid },
+          },
+        },
+        limit: 100,
+      },
+    }),
+  });
+
+  const results = await res.json();
+  if (!Array.isArray(results)) return;
+
+  await Promise.all(
+    results
+      .filter((r) => r.document?.name)
+      .map((r) =>
+        fetch(`https://firestore.googleapis.com/v1/${r.document.name}`, {
+          method: 'DELETE',
+          headers: { Authorization: `Bearer ${adminToken}` },
+        })
+      )
+  );
+}
+
 const ALLOWED_ORIGIN = 'https://js-grw-up.com';
 
 const corsHeaders = (origin) => ({
@@ -86,7 +154,6 @@ export async function onRequestPost(context) {
   const SA_EMAIL   = env.FIREBASE_SA_EMAIL;
   const SA_KEY     = env.FIREBASE_SA_PRIVATE_KEY;
 
-  // Verify the caller's Firebase ID token
   const authHeader = request.headers.get('Authorization') || '';
   if (!authHeader.startsWith('Bearer ')) return jsonRes({ error: 'Unauthorized' }, 401, origin);
   const idToken = authHeader.slice(7);
@@ -95,6 +162,7 @@ export async function onRequestPost(context) {
     return jsonRes({ error: 'Server misconfiguration: missing Firebase env vars' }, 500, origin);
   }
 
+  // Verify the caller's Firebase ID token
   const lookupRes = await fetch(
     `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${API_KEY}`,
     { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ idToken }) }
@@ -107,41 +175,84 @@ export async function onRequestPost(context) {
 
   const fsBase = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
 
-  // Delete the user's own Firestore documents (user's own token is enough — they own these)
-  await fetch(`${fsBase}/users/${uid}`,     { method: 'DELETE', headers: { Authorization: `Bearer ${idToken}` } });
-  await fetch(`${fsBase}/fcmTokens/${uid}`, { method: 'DELETE', headers: { Authorization: `Bearer ${idToken}` } });
-
-  // If service account credentials are present, delete the Firebase Auth record too
-  if (SA_EMAIL && SA_KEY) {
-    let adminToken;
-    try {
-      adminToken = await getAdminToken(SA_EMAIL, SA_KEY);
-    } catch (err) {
-      console.error('Admin token error:', err.message);
-      return jsonRes({ success: true, authDeleted: false, note: 'Firestore deleted; Auth user not removed (admin token failed)' }, 200, origin);
-    }
-
-    // batchDelete is the admin endpoint — no recent-login restriction
-    const deleteRes = await fetch(
-      `https://identitytoolkit.googleapis.com/v1/projects/${PROJECT_ID}/accounts:batchDelete`,
-      {
-        method:  'POST',
-        headers: { Authorization: `Bearer ${adminToken}`, 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ localIds: [uid], force: true }),
-      }
-    );
-
-    const deleteBody = await deleteRes.json().catch(() => ({}));
-
-    if (!deleteRes.ok || (deleteBody.errors && deleteBody.errors.length > 0)) {
-      console.error('batchDelete error:', JSON.stringify(deleteBody));
-      return jsonRes({
-        success: true,
-        authDeleted: false,
-        note: `Firestore deleted; Auth delete error: ${JSON.stringify(deleteBody.errors || deleteBody)}`,
-      }, 200, origin);
-    }
+  // Get admin token for server-side Firestore operations
+  if (!SA_EMAIL || !SA_KEY) {
+    // No service account — just delete what the user owns
+    await fetch(`${fsBase}/users/${uid}`,     { method: 'DELETE', headers: { Authorization: `Bearer ${idToken}` } });
+    await fetch(`${fsBase}/fcmTokens/${uid}`, { method: 'DELETE', headers: { Authorization: `Bearer ${idToken}` } });
+    await fetch(`${fsBase}/pendingLinks/${uid}`, { method: 'DELETE', headers: { Authorization: `Bearer ${idToken}` } });
+    return jsonRes({ success: true, authDeleted: false, note: 'Profile deleted; family data not deleted (no service account)' }, 200, origin);
   }
 
-  return jsonRes({ success: true, authDeleted: !!SA_EMAIL }, 200, origin);
+  let adminToken;
+  try {
+    adminToken = await getAdminToken(SA_EMAIL, SA_KEY);
+  } catch (err) {
+    return jsonRes({ error: `Admin token error: ${err.message}` }, 500, origin);
+  }
+
+  // Read user profile to get familyId before deleting it
+  const profileRes = await fetch(`${fsBase}/users/${uid}`, {
+    headers: { Authorization: `Bearer ${adminToken}` },
+  });
+  const profileData = profileRes.ok ? await profileRes.json() : null;
+  const familyId = profileData?.fields?.familyId?.stringValue;
+
+  // Delete all family data across every collection
+  const FAMILY_COLLECTIONS = [
+    'chatMessages',
+    'calendarEvents',
+    'requests',
+    'incidentReports',
+    'expenses',
+    'dailyLogs',
+    'progressEntries',
+    'coParentingRules',
+  ];
+
+  const cleanupTasks = [];
+
+  if (familyId) {
+    for (const col of FAMILY_COLLECTIONS) {
+      cleanupTasks.push(deleteByFamilyId(fsBase, adminToken, col, familyId));
+    }
+    // Delete the family document itself
+    cleanupTasks.push(
+      fetch(`${fsBase}/families/${familyId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${adminToken}` },
+      })
+    );
+  }
+
+  // Delete invites created by this user
+  cleanupTasks.push(deleteUserInvites(fsBase, adminToken, uid));
+
+  // Delete user-owned docs
+  cleanupTasks.push(fetch(`${fsBase}/users/${uid}`,        { method: 'DELETE', headers: { Authorization: `Bearer ${adminToken}` } }));
+  cleanupTasks.push(fetch(`${fsBase}/fcmTokens/${uid}`,    { method: 'DELETE', headers: { Authorization: `Bearer ${adminToken}` } }));
+  cleanupTasks.push(fetch(`${fsBase}/pendingLinks/${uid}`, { method: 'DELETE', headers: { Authorization: `Bearer ${adminToken}` } }));
+
+  await Promise.all(cleanupTasks);
+
+  // Delete the Firebase Auth account last
+  const deleteRes = await fetch(
+    `https://identitytoolkit.googleapis.com/v1/projects/${PROJECT_ID}/accounts:batchDelete`,
+    {
+      method:  'POST',
+      headers: { Authorization: `Bearer ${adminToken}`, 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ localIds: [uid], force: true }),
+    }
+  );
+
+  const deleteBody = await deleteRes.json().catch(() => ({}));
+  if (!deleteRes.ok || (deleteBody.errors && deleteBody.errors.length > 0)) {
+    return jsonRes({
+      success: true,
+      authDeleted: false,
+      note: `Data deleted; Auth delete error: ${JSON.stringify(deleteBody.errors || deleteBody)}`,
+    }, 200, origin);
+  }
+
+  return jsonRes({ success: true, authDeleted: true }, 200, origin);
 }
