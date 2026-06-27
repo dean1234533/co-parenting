@@ -101,7 +101,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    // Safety net: if auth never resolves (e.g. Firestore IndexedDB lock), unblock after 8s
+    const authTimeout = setTimeout(() => {
+      setIsLoadingAuth(false);
+      setAuthChecked(true);
+    }, 8000);
+
     const unsubAuth = onAuthStateChanged(auth, (firebaseUser) => {
+      clearTimeout(authTimeout);
       if (firebaseUser) {
         subscribeToProfile(firebaseUser);
       } else {
@@ -118,6 +125,7 @@ export const AuthProvider = ({ children }) => {
       }
     });
     return () => {
+      clearTimeout(authTimeout);
       unsubAuth();
       if (profileUnsubRef.current) profileUnsubRef.current();
       if (pendingUnsubRef.current) pendingUnsubRef.current();

@@ -3,7 +3,7 @@ import { getAuth } from 'firebase/auth';
 import {
   initializeFirestore,
   persistentLocalCache,
-  persistentMultipleTabManager,
+  persistentSingleTabManager,
 } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getMessaging, isSupported } from 'firebase/messaging';
@@ -24,7 +24,7 @@ export const auth = getAuth(app);
 // Firestore with persistent offline cache (works across multiple tabs)
 export const firestore = initializeFirestore(app, {
   localCache: persistentLocalCache({
-    tabManager: persistentMultipleTabManager(),
+    tabManager: persistentSingleTabManager({ forceOwnership: true }),
   }),
 });
 
