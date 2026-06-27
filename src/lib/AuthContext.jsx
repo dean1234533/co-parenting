@@ -45,8 +45,13 @@ export const AuthProvider = ({ children }) => {
           await signOut(auth);
           return;
         }
+        // For email/password registration, Firebase Auth has no displayName yet —
+        // Register will call createUserProfile with the real name, which fires a
+        // second snapshot and unblocks loading. Only auto-create for OAuth sign-ins
+        // where displayName is already populated (e.g. Google).
+        if (!firebaseUser.displayName) return;
         const newProfile = {
-          displayName: firebaseUser.displayName || '',
+          displayName: firebaseUser.displayName,
           email: firebaseUser.email,
           familyId: firebaseUser.uid,
           partnerId: null,
