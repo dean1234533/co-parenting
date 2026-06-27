@@ -2,7 +2,7 @@ import db from '@/api/db';
 import { createUserProfile } from '@/lib/userProfile';
 
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import AuthLayout from "@/components/AuthLayout";
 import { toast } from "@/components/ui/use-toast";
 
 export default function Register() {
+  const navigate = useNavigate();
   const accountDeleted = new URLSearchParams(window.location.search).get('deleted') === 'true';
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -38,7 +39,7 @@ export default function Register() {
         });
       }
       const next = new URLSearchParams(window.location.search).get('next');
-      window.location.href = next || '/dashboard';
+      navigate(next || '/dashboard', { replace: true });
     } catch (err) {
       setError(err.message || "Registration failed");
     } finally {
