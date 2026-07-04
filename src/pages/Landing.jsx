@@ -175,11 +175,11 @@ function TestimonialCarousel({ items }) {
   }, [api]);
 
   return (
-    <div>
+    <div className="max-w-xl mx-auto">
       <Carousel setApi={setApi} opts={{ loop: true, align: 'start' }}>
         <CarouselContent>
           {items.map((t) => (
-            <CarouselItem key={t.name} className="basis-full sm:basis-1/2">
+            <CarouselItem key={t.name} className="basis-full">
               <TestimonialCard {...t} />
             </CarouselItem>
           ))}
