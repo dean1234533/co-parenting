@@ -14,43 +14,48 @@ service cloud.firestore {
     match /users/{uid} {
       allow read: if isAuthenticated() && (isOwner(uid) || getUserData().partnerId == uid);
       allow create: if isAuthenticated() && isOwner(uid);
-      // Clients cannot touch payment or admin fields — only the server can
-      allow update: if isAuthenticated() && isOwner(uid)
-        && !request.resource.data.diff(resource.data).affectedKeys()
-            .hasAny(['subscriptionStatus', 'subscriptionId', 'customerId', 'currentPeriodEnd', 'isAdmin']);
+      allow update: if isAuthenticated() && isOwner(uid) && (
+        // Ordinary profile edits — never touch payment/admin/linking fields.
+        // familyId/partnerId are excluded here because family-linking must
+        // go through the validated server flow below, not a direct write:
+        // familyId is derived from another user's uid, and it's exposed in
+        // publicly-readable invite docs, so without this restriction any
+        // signed-in user could set their own familyId to someone else's
+        // and gain read/write access to that family's shared data.
+        (!request.resource.data.diff(resource.data).affectedKeys()
+            .hasAny(['subscriptionStatus', 'subscriptionId', 'customerId', 'currentPeriodEnd', 'isAdmin', 'familyId', 'partnerId']))
+        ||
+        // Self-service unlink: you may always disconnect yourself back to
+        // your own solo family — this can't grant access to anyone else's.
+        (request.resource.data.familyId == uid && request.resource.data.partnerId == null)
+      );
     }
     match /pendingLinks/{uid} {
       allow read, delete: if isAuthenticated() && isOwner(uid);
-      allow write: if isAuthenticated();
+      // Only a current linked partner may leave an "unlink" notice for the
+      // other side to pick up — this collection no longer carries linking
+      // data (that's handled server-side), only unlink notifications, so
+      // it can't be used to redirect someone's family link to an attacker.
+      allow write: if isAuthenticated()
+        && request.resource.data.partnerId == null
+        && getUserData().partnerId == uid;
     }
     match /families/{familyId} {
-      allow read: if isAuthenticated() && (
-        resource.data.member1Id == request.auth.uid ||
-        resource.data.member2Id == request.auth.uid
-      );
-      allow create: if isAuthenticated() && (
-        request.resource.data.member1Id == request.auth.uid ||
-        request.resource.data.member2Id == request.auth.uid
-      );
-      allow update, delete: if isAuthenticated() && (
-        resource.data.member1Id == request.auth.uid ||
-        resource.data.member2Id == request.auth.uid
-      );
+      // Family membership is only ever established by the server-side
+      // /api/accept-invite flow (via a service account, which bypasses
+      // these rules) after it validates a genuine accepted invite. No
+      // client write is legitimate, so this is fully locked down.
+      allow read, write: if false;
     }
     match /invites/{token} {
       // Invite links must be readable before the recipient signs in, but
       // tokens are unguessable (crypto-random), so this doesn't leak data.
       allow read: if true;
       allow create: if isAuthenticated() && request.resource.data.createdBy == request.auth.uid;
-      // Creator may revoke/edit their own invite. Anyone else may only flip
-      // a still-pending invite to accepted, recording themselves as acceptor.
-      allow update: if isAuthenticated() && (
-        resource.data.createdBy == request.auth.uid ||
-        (resource.data.status == 'pending'
-          && request.resource.data.status == 'accepted'
-          && request.resource.data.acceptedBy == request.auth.uid
-          && request.auth.uid != resource.data.createdBy)
-      );
+      // Only the creator may edit/revoke their own invite from the client.
+      // Acceptance (status -> accepted) is performed server-side by
+      // /api/accept-invite, which validates the invite before linking.
+      allow update: if isAuthenticated() && resource.data.createdBy == request.auth.uid;
     }
     match /fcmTokens/{uid} {
       allow read: if isAuthenticated() && (isOwner(uid) || getUserData().partnerId == uid);

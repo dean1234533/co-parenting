@@ -1,8 +1,8 @@
 import {
-  doc, setDoc, getDoc, updateDoc
+  doc, setDoc, getDoc
 } from 'firebase/firestore';
 import { firestore, auth } from '@/lib/firebase';
-import { getUserProfile, linkPartners } from '@/lib/userProfile';
+import { getUserProfile } from '@/lib/userProfile';
 
 function generateToken() {
   // crypto.getRandomValues is a CSPRNG — invite tokens grant account linking,
@@ -48,34 +48,18 @@ export async function acceptInvite(token) {
   const user = auth.currentUser;
   if (!user) throw new Error('Not authenticated');
 
-  const invite = await getInvite(token);
-  if (!invite) throw new Error('Invite not found or has expired. Ask your co-parent to send a new invite link.');
-  if (invite.expiresAt && new Date(invite.expiresAt) < new Date()) {
-    throw new Error('This invite has expired. Ask your co-parent to send a new invite link.');
-  }
-  if (invite.createdBy === user.uid) throw new Error('You cannot accept your own invite');
-
-  const myProfile = await getUserProfile(user.uid);
-  if (!myProfile) throw new Error('Your profile is not set up yet. Please try again in a moment.');
-
-  // Block only if already linked to a *different* co-parent — allow re-linking to the same person
-  const alreadyLinked = myProfile.partnerId && myProfile.partnerId !== invite.createdBy;
-  if (alreadyLinked) throw new Error('You are already linked with a different co-parent.');
-
-  // Link the two accounts
-  const familyId = await linkPartners(
-    invite.createdBy,
-    user.uid,
-    invite.createdByName,
-    myProfile.displayName
-  );
-
-  // Mark invite as accepted (or update if already accepted by this user)
-  await updateDoc(doc(firestore, 'invites', token), {
-    status: 'accepted',
-    acceptedBy: user.uid,
-    acceptedAt: new Date().toISOString(),
+  // Linking accounts grants shared access to messages, expenses, incident
+  // reports etc., so it's validated and performed server-side (with a
+  // service account) rather than as direct client Firestore writes — the
+  // client can't be trusted to prove an invite was genuinely accepted.
+  const idToken = await user.getIdToken();
+  const res = await fetch('/api/accept-invite', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+    body: JSON.stringify({ token }),
   });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Could not accept this invite. Please try again.');
 
-  return familyId;
+  return data.familyId;
 }

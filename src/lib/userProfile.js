@@ -32,35 +32,10 @@ export async function updateUserProfile(uid, data) {
   }
 }
 
-export async function linkPartners(inviterUid, acceptorUid, inviterName, acceptorName) {
-  const familyId = `family_${inviterUid}`;
-
-  // Create shared family document (any authenticated user can write)
-  await setDoc(doc(firestore, 'families', familyId), {
-    member1Id: inviterUid,
-    member1Name: inviterName,
-    member2Id: acceptorUid,
-    member2Name: acceptorName,
-    createdAt: new Date().toISOString(),
-  });
-
-  // Update acceptor's OWN doc (they own it — always allowed)
-  await setDoc(doc(firestore, 'users', acceptorUid), {
-    familyId,
-    partnerId: inviterUid,
-    partnerName: inviterName,
-  }, { merge: true });
-
-  // Leave a pending link for the inviter — they apply it to their own doc on next load
-  await setDoc(doc(firestore, 'pendingLinks', inviterUid), {
-    familyId,
-    partnerId: acceptorUid,
-    partnerName: acceptorName,
-    linkedAt: new Date().toISOString(),
-  });
-
-  return familyId;
-}
+// Linking two accounts together is handled server-side by
+// /api/accept-invite (see functions/api/accept-invite.js) — it's the trust
+// boundary that validates a real, unexpired, accepted invite before
+// granting shared family data access, which a client-side write can't do.
 
 export async function applyPendingLink(uid) {
   const snap = await getDoc(doc(firestore, 'pendingLinks', uid));
@@ -72,24 +47,4 @@ export async function applyPendingLink(uid) {
   await deleteDoc(doc(firestore, 'pendingLinks', uid));
 
   return { familyId, partnerId, partnerName };
-}
-
-export async function unlinkPartners(myUid, partnerUid, currentFamilyId) {
-  await updateDoc(doc(firestore, 'users', myUid), {
-    familyId: myUid,
-    partnerId: null,
-    partnerName: null,
-  });
-
-  // Leave a pending unlink for the partner
-  await setDoc(doc(firestore, 'pendingLinks', partnerUid), {
-    familyId: partnerUid,
-    partnerId: null,
-    partnerName: null,
-    linkedAt: new Date().toISOString(),
-  });
-
-  if (currentFamilyId) {
-    await deleteDoc(doc(firestore, 'families', currentFamilyId));
-  }
 }
