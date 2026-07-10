@@ -28,16 +28,29 @@ service cloud.firestore {
         resource.data.member1Id == request.auth.uid ||
         resource.data.member2Id == request.auth.uid
       );
-      allow create: if isAuthenticated();
+      allow create: if isAuthenticated() && (
+        request.resource.data.member1Id == request.auth.uid ||
+        request.resource.data.member2Id == request.auth.uid
+      );
       allow update, delete: if isAuthenticated() && (
         resource.data.member1Id == request.auth.uid ||
         resource.data.member2Id == request.auth.uid
       );
     }
     match /invites/{token} {
+      // Invite links must be readable before the recipient signs in, but
+      // tokens are unguessable (crypto-random), so this doesn't leak data.
       allow read: if true;
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
+      allow create: if isAuthenticated() && request.resource.data.createdBy == request.auth.uid;
+      // Creator may revoke/edit their own invite. Anyone else may only flip
+      // a still-pending invite to accepted, recording themselves as acceptor.
+      allow update: if isAuthenticated() && (
+        resource.data.createdBy == request.auth.uid ||
+        (resource.data.status == 'pending'
+          && request.resource.data.status == 'accepted'
+          && request.resource.data.acceptedBy == request.auth.uid
+          && request.auth.uid != resource.data.createdBy)
+      );
     }
     match /fcmTokens/{uid} {
       allow read: if isAuthenticated() && (isOwner(uid) || getUserData().partnerId == uid);
@@ -74,6 +87,14 @@ service cloud.firestore {
     match /coParentingRules/{docId} {
       allow read, write: if isAuthenticated() && inSameFamily(resource.data.familyId);
       allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId);
+    }
+    // Audit trail (e.g. PDF exports) — append-only. Nothing may edit or
+    // delete an entry once written, so it stays trustworthy as a record.
+    match /auditLogs/{docId} {
+      allow read: if isAuthenticated() && inSameFamily(resource.data.familyId);
+      allow create: if isAuthenticated() && inSameFamily(request.resource.data.familyId)
+        && request.resource.data.created_by_id == request.auth.uid;
+      allow update, delete: if false;
     }
   }
 }

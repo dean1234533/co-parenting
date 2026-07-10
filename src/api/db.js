@@ -139,7 +139,16 @@ const authApi = {
 const integrationsApi = {
   Core: {
     async UploadFile({ file }) {
-      const storageRef = ref(storage, `uploads/${Date.now()}_${file.name}`);
+      const uid = auth.currentUser?.uid;
+      if (!uid) throw new Error('Not authenticated');
+
+      // Scope the storage path by family (or by uid before linking) so
+      // storage.rules can restrict access to only the uploader's family.
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const basePath = currentFamilyId
+        ? `uploads/family/${currentFamilyId}`
+        : `uploads/user/${uid}`;
+      const storageRef = ref(storage, `${basePath}/${Date.now()}_${safeName}`);
       await uploadBytes(storageRef, file);
       const file_url = await getDownloadURL(storageRef);
       return { file_url };

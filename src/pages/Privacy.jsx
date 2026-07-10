@@ -59,30 +59,41 @@ export default function Privacy() {
 
         <Section title="4. Data Sharing">
           <p><strong className="text-foreground">With your linked co-parent:</strong> When you link accounts, certain data is shared between you — including messages, calendar events, requests, expenses, and records. This is the core function of the app.</p>
-          <p><strong className="text-foreground">Service providers:</strong> We use Firebase (Google) for authentication, database storage, and push notifications. Google's privacy policy applies to their infrastructure. We use Cloudflare for hosting. No other third parties have access to your personal data.</p>
+          <p><strong className="text-foreground">Service providers (sub-processors):</strong> We use the following third parties to operate the service. Each only receives the minimum data needed to perform its function:</p>
+          <ul className="list-disc pl-6 space-y-1">
+            <li><strong className="text-foreground">Firebase (Google):</strong> authentication, database storage, file storage, and push notifications.</li>
+            <li><strong className="text-foreground">Cloudflare:</strong> website hosting and the serverless functions that process payments and notifications.</li>
+            <li><strong className="text-foreground">Stripe:</strong> payment processing for Premium subscriptions. We never see or store your card details — Stripe handles them directly.</li>
+          </ul>
+          <p>No other third parties have access to your personal data, and we do not sell or rent your data to anyone.</p>
           <p><strong className="text-foreground">Legal requirements:</strong> We may disclose information if required by law or to protect the rights and safety of users or the public.</p>
         </Section>
 
         <Section title="5. Data Storage and Security">
-          <p>Your data is stored in Google Firebase, which provides encrypted storage and secure access controls. Data is protected in transit using TLS encryption.</p>
-          <p>Access to your data is restricted by Firestore security rules — only you and your linked co-parent can access your shared records.</p>
+          <p>Your data is stored in Google Firebase, which provides encrypted storage and secure access controls. Data is protected in transit using TLS encryption, and Firestore/Storage encrypt data at rest by default.</p>
+          <p>Access to your data is restricted by Firestore and Storage security rules — only you and your linked co-parent can access your shared records. Security-sensitive actions (such as account deletion and payment webhooks) are verified server-side, and invite links use cryptographically random tokens that expire after 7 days.</p>
+          <p>We keep an append-only audit log of certain actions (such as PDF exports) so it's possible to show who generated a record and when — this cannot be edited or deleted once written.</p>
           <p>While we take reasonable precautions to protect your data, no system is completely secure. We cannot guarantee absolute security.</p>
         </Section>
 
-        <Section title="6. Data Retention">
-          <p>Your data is retained for as long as your account is active. If you delete your account, your profile is removed immediately. Shared content (such as messages and calendar records) may remain in the shared family space and be accessible to your co-parent.</p>
-          <p>You may request deletion of specific shared records by contacting us through the app.</p>
+        <Section title="6. Data Breach Notification">
+          <p>If we become aware of a data breach that is likely to result in a risk to your rights and freedoms, we will notify affected users without undue delay, and any relevant supervisory authority where required by law (for example, within 72 hours under UK/EU data protection law where applicable).</p>
         </Section>
 
-        <Section title="7. Push Notifications">
+        <Section title="7. Data Retention">
+          <p>Your data is retained for as long as your account is active. If you delete your account, your profile, linked family data, and associated records (messages, calendar events, requests, incident reports, expenses, daily logs, progress entries and rules) are deleted from our systems. Shared content may take up to a few minutes to fully propagate deletion across all collections.</p>
+          <p>You may request deletion of specific shared records by contacting us through the app, and you may fully delete your account and all associated family data at any time from Settings.</p>
+        </Section>
+
+        <Section title="8. Push Notifications">
           <p>If you grant notification permission, we store a push notification token on your device and in our database. This token is used solely to deliver notifications from your linked co-parent's activity. You can revoke notification permission at any time from your device settings or from within the Js-Grw-Up app sidebar.</p>
         </Section>
 
-        <Section title="8. Children's Privacy">
+        <Section title="9. Children's Privacy">
           <p>Js-Grw-Up is intended for adults (18+) only. We do not knowingly collect data from children. If you believe a child has created an account, please contact us so we can delete it.</p>
         </Section>
 
-        <Section title="9. Your Rights">
+        <Section title="10. Your Rights">
           <p>Depending on your location, you may have the right to:</p>
           <ul className="list-disc pl-6 space-y-1">
             <li>Access the personal data we hold about you</li>
@@ -94,15 +105,15 @@ export default function Privacy() {
           <p>To exercise these rights, delete your account from Settings or contact us through the app.</p>
         </Section>
 
-        <Section title="10. Cookies and Local Storage">
+        <Section title="11. Cookies and Local Storage">
           <p>Js-Grw-Up uses browser local storage to remember your name for the login greeting and to maintain your authentication session. We do not use advertising cookies or tracking cookies.</p>
         </Section>
 
-        <Section title="11. Changes to This Policy">
+        <Section title="12. Changes to This Policy">
           <p>We may update this Privacy Policy from time to time. We will notify you of significant changes by updating the "Last updated" date. Continued use of the app constitutes acceptance of the revised policy.</p>
         </Section>
 
-        <Section title="12. Contact">
+        <Section title="13. Contact">
           <p>If you have any questions about this Privacy Policy or how we handle your data, please contact us through the app.</p>
         </Section>
 

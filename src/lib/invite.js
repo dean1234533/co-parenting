@@ -5,7 +5,10 @@ import { firestore, auth } from '@/lib/firebase';
 import { getUserProfile, linkPartners } from '@/lib/userProfile';
 
 function generateToken() {
-  return Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+  // crypto.getRandomValues is a CSPRNG — invite tokens grant account linking,
+  // so they must not be predictable the way Math.random() output can be.
+  const bytes = crypto.getRandomValues(new Uint8Array(24));
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
 }
 
 export async function createInvite() {
@@ -43,16 +46,16 @@ export async function getInvite(token) {
 
 export async function acceptInvite(token) {
   const user = auth.currentUser;
-  console.log('[acceptInvite] token=%s uid=%s', token, user?.uid);
   if (!user) throw new Error('Not authenticated');
 
   const invite = await getInvite(token);
-  console.log('[acceptInvite] invite=', invite);
   if (!invite) throw new Error('Invite not found or has expired. Ask your co-parent to send a new invite link.');
+  if (invite.expiresAt && new Date(invite.expiresAt) < new Date()) {
+    throw new Error('This invite has expired. Ask your co-parent to send a new invite link.');
+  }
   if (invite.createdBy === user.uid) throw new Error('You cannot accept your own invite');
 
   const myProfile = await getUserProfile(user.uid);
-  console.log('[acceptInvite] myProfile=', myProfile);
   if (!myProfile) throw new Error('Your profile is not set up yet. Please try again in a moment.');
 
   // Block only if already linked to a *different* co-parent — allow re-linking to the same person
@@ -66,7 +69,6 @@ export async function acceptInvite(token) {
     invite.createdByName,
     myProfile.displayName
   );
-  console.log('[acceptInvite] ✅ linkPartners done familyId=%s', familyId);
 
   // Mark invite as accepted (or update if already accepted by this user)
   await updateDoc(doc(firestore, 'invites', token), {
@@ -75,6 +77,5 @@ export async function acceptInvite(token) {
     acceptedAt: new Date().toISOString(),
   });
 
-  console.log('[acceptInvite] ✅ done');
   return familyId;
 }

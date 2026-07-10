@@ -33,8 +33,6 @@ export default function AcceptInvite() {
 
   // Auto-accept when user just registered/signed-in via the invite link
   useEffect(() => {
-    console.log('[AcceptInvite] auto-accept check: autoAccept=%s loading=%s isLoadingAuth=%s isAuthenticated=%s hasInvite=%s done=%s accepting=%s',
-      autoAccept, loading, isLoadingAuth, isAuthenticated, !!invite, done, accepting);
     if (!autoAccept || loading || isLoadingAuth || !isAuthenticated || !invite || done || accepting) return;
     handleAccept();
   }, [autoAccept, loading, isLoadingAuth, isAuthenticated, invite, done, accepting]);

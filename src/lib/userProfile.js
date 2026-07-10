@@ -34,10 +34,8 @@ export async function updateUserProfile(uid, data) {
 
 export async function linkPartners(inviterUid, acceptorUid, inviterName, acceptorName) {
   const familyId = `family_${inviterUid}`;
-  console.log('[linkPartners] inviter=%s acceptor=%s familyId=%s', inviterUid, acceptorUid, familyId);
 
   // Create shared family document (any authenticated user can write)
-  console.log('[linkPartners] writing families/%s', familyId);
   await setDoc(doc(firestore, 'families', familyId), {
     member1Id: inviterUid,
     member1Name: inviterName,
@@ -45,26 +43,21 @@ export async function linkPartners(inviterUid, acceptorUid, inviterName, accepto
     member2Name: acceptorName,
     createdAt: new Date().toISOString(),
   });
-  console.log('[linkPartners] ✅ families doc written');
 
   // Update acceptor's OWN doc (they own it — always allowed)
-  console.log('[linkPartners] writing users/%s', acceptorUid);
   await setDoc(doc(firestore, 'users', acceptorUid), {
     familyId,
     partnerId: inviterUid,
     partnerName: inviterName,
   }, { merge: true });
-  console.log('[linkPartners] ✅ acceptor profile updated');
 
   // Leave a pending link for the inviter — they apply it to their own doc on next load
-  console.log('[linkPartners] writing pendingLinks/%s', inviterUid);
   await setDoc(doc(firestore, 'pendingLinks', inviterUid), {
     familyId,
     partnerId: acceptorUid,
     partnerName: acceptorName,
     linkedAt: new Date().toISOString(),
   });
-  console.log('[linkPartners] ✅ pendingLink written for inviter');
 
   return familyId;
 }

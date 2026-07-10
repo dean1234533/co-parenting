@@ -1,9 +1,20 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    match /uploads/{allPaths=**} {
-      allow read: if true;
-      allow write: if request.auth != null;
+    function isSignedIn() { return request.auth != null; }
+    function userFamilyId() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.familyId;
+    }
+
+    // Files uploaded while linked to a co-parent — only the two linked
+    // members of that family may read or write.
+    match /uploads/family/{familyId}/{fileName} {
+      allow read, write: if isSignedIn() && userFamilyId() == familyId;
+    }
+
+    // Files uploaded before linking with a co-parent — only the uploader.
+    match /uploads/user/{uid}/{fileName} {
+      allow read, write: if isSignedIn() && request.auth.uid == uid;
     }
   }
 }

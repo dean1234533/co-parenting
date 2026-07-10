@@ -55,7 +55,7 @@ export default function ExportPDF() {
     setSections((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
-  const generatePDF = () => {
+  const generatePDF = async () => {
     setGenerating(true);
     try {
       generateAndDownloadPDF(
@@ -70,6 +70,12 @@ export default function ExportPDF() {
         },
         'js-grw-up-report.pdf'
       );
+      // Record who exported records and when — this is what makes an export
+      // credible as a record (and traceable if disputed).
+      await db.entities.AuditLog.create({
+        action: 'pdf_export',
+        sections: Object.entries(sections).filter(([, on]) => on).map(([key]) => key),
+      }).catch(() => {});
     } finally {
       setGenerating(false);
     }

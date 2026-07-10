@@ -75,28 +75,33 @@ export default function Terms() {
           <p>You are solely responsible for the accuracy and legality of content you post. Js-Grw-Up does not verify the accuracy of user-submitted information.</p>
         </Section>
 
-        <Section title="8. Data and Privacy">
+        <Section title="8. Subscriptions and Billing">
+          <p>Js-Grw-Up offers a free plan and a Premium subscription billed monthly. Payments are processed securely by Stripe — we do not receive or store your card details.</p>
+          <p>Premium subscriptions renew automatically each month until cancelled. You can cancel at any time from Settings; your Premium features remain active until the end of the current billing period, after which your account reverts to the Free plan. Fees already paid are non-refundable except where required by law.</p>
+        </Section>
+
+        <Section title="9. Data and Privacy">
           <p>Your use of Js-Grw-Up is also governed by our <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>, which is incorporated into these Terms by reference.</p>
         </Section>
 
-        <Section title="9. Account Deletion">
-          <p>You may delete your account at any time from the Settings page. Upon deletion, your profile is removed. Shared data (such as messages and calendar events) may remain accessible to your linked co-parent as it is part of the shared family record.</p>
+        <Section title="10. Account Deletion">
+          <p>You may delete your account at any time from the Settings page. Upon deletion, your profile, linked family data, and associated records are removed from our systems as described in our Privacy Policy.</p>
         </Section>
 
-        <Section title="10. Disclaimers">
+        <Section title="11. Disclaimers">
           <p>Js-Grw-Up is provided "as is" without warranties of any kind. We do not guarantee that the service will be uninterrupted, error-free, or that data will never be lost.</p>
           <p>Js-Grw-Up is not a substitute for legal advice, mediation, or court-ordered parenting plans. Always consult a qualified legal professional for matters involving custody or parental rights.</p>
         </Section>
 
-        <Section title="11. Limitation of Liability">
+        <Section title="12. Limitation of Liability">
           <p>To the fullest extent permitted by law, Js-Grw-Up and its operators shall not be liable for any indirect, incidental, or consequential damages arising from your use of the app, including loss of data, relationship disputes, or legal proceedings.</p>
         </Section>
 
-        <Section title="12. Changes to Terms">
+        <Section title="13. Changes to Terms">
           <p>We may update these Terms from time to time. Continued use of the app after changes are posted constitutes your acceptance of the revised Terms.</p>
         </Section>
 
-        <Section title="13. Contact">
+        <Section title="14. Contact">
           <p>If you have any questions about these Terms, please contact us through the app.</p>
         </Section>
 
