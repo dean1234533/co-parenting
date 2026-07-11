@@ -1,32 +1,24 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
-  MessageSquare, CalendarDays, AlertTriangle, GraduationCap,
-  PoundSterling, Receipt, FileText, BookOpen, ClipboardCheck,
-  Home, Menu, X, ChevronRight, Heart, NotebookPen, Bell, BellOff, BellRing, UserPlus, Settings, Sparkles, HelpCircle
+  MessageSquare, CalendarDays, GraduationCap,
+  PoundSterling, FileText, BookOpen, ClipboardCheck,
+  Home, Menu, X, ChevronRight, Heart, NotebookPen, Bell, BellOff, BellRing, UserPlus, Settings, HelpCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel,
-  AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
-  AlertDialogHeader, AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from '@/lib/AuthContext';
-import { useSubscription } from '@/hooks/useSubscription';
 import InvitePartner from '@/components/InvitePartner';
-import { auth } from '@/lib/firebase';
 
+// Incidents and Receipts are removed for the v1 launch — see App.jsx.
 const navItems = [
   { path: "/dashboard", label: "Dashboard", icon: Home },
   { path: "/chat", label: "Messages", icon: MessageSquare },
   { path: "/requests", label: "Requests", icon: ClipboardCheck },
   { path: "/calendar", label: "Calendar", icon: CalendarDays },
-  { path: "/incidents", label: "Incidents", icon: AlertTriangle },
   { path: "/progress", label: "Progress", icon: GraduationCap },
   { path: "/finances", label: "Finances", icon: PoundSterling },
-  { path: "/receipts", label: "Receipts", icon: Receipt },
   { path: "/daily-log", label: "Daily Log", icon: NotebookPen },
   { path: "/rules", label: "Rules", icon: BookOpen },
   { path: "/export", label: "Export PDF", icon: FileText },
@@ -36,7 +28,6 @@ export default function Sidebar() {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
-  const { isPaid } = useSubscription();
   const { permission, requestPermission } = usePushNotifications();
   const { profile } = useAuth();
 
@@ -145,16 +136,6 @@ export default function Sidebar() {
               <BellOff className="h-4 w-4" />
               Notifications blocked
             </div>
-          )}
-          {!isPaid && (
-            <Link
-              to="/subscribe"
-              onClick={() => setMobileOpen(false)}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-            >
-              <Sparkles className="h-4 w-4" />
-              Upgrade to Premium · £5/mo
-            </Link>
           )}
           <a
             href="https://wa.me/447752300937"

@@ -1,5 +1,5 @@
 import {
-  doc, getDoc, setDoc, updateDoc, deleteDoc
+  doc, getDoc, setDoc, updateDoc, deleteDoc, increment
 } from 'firebase/firestore';
 import { updateProfile } from 'firebase/auth';
 import { auth, firestore } from '@/lib/firebase';
@@ -21,6 +21,14 @@ export async function createUserProfile(uid, { displayName, email }) {
   await setDoc(doc(firestore, 'users', uid), profile, { merge: true });
   if (auth.currentUser) {
     await updateProfile(auth.currentUser, { displayName });
+  }
+  // Best-effort signup counter — used only to show a "we're at capacity"
+  // message on Register once VITE_MAX_USERS is reached (see config.js).
+  // Not a security boundary, just a cost-control valve for the free tier.
+  try {
+    await setDoc(doc(firestore, 'meta', 'stats'), { userCount: increment(1) }, { merge: true });
+  } catch {
+    // Non-fatal — worst case the counter under-counts and the cap check is skipped.
   }
   return { id: uid, ...profile };
 }

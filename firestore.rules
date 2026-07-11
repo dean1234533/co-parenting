@@ -57,6 +57,15 @@ service cloud.firestore {
       // /api/accept-invite, which validates the invite before linking.
       allow update: if isAuthenticated() && resource.data.createdBy == request.auth.uid;
     }
+    // Best-effort signup counter for the "at capacity" check on Register —
+    // a cost-control valve, not a security boundary. Only ever moves up by
+    // exactly 1 per write, so a client can't reset or inflate it.
+    match /meta/stats {
+      allow read: if true;
+      allow create: if isAuthenticated() && request.resource.data.userCount == 1;
+      allow update: if isAuthenticated()
+        && request.resource.data.userCount == resource.data.userCount + 1;
+    }
     match /fcmTokens/{uid} {
       allow read: if isAuthenticated() && (isOwner(uid) || getUserData().partnerId == uid);
       allow write: if isAuthenticated() && isOwner(uid);

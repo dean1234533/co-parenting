@@ -22,18 +22,14 @@ import Privacy from "@/pages/Privacy";
 
 // Layout
 import AppLayout from "@/components/layout/AppLayout";
-import PaywallGate from "@/components/PaywallGate";
 
 // Pages
 import Landing from "@/pages/Landing";
-import Subscribe from "@/pages/Subscribe";
 import Dashboard from "@/pages/Dashboard";
 import Chat from "@/pages/Chat";
 import Requests from "@/pages/Requests";
-import Incidents from "@/pages/Incidents";
 import Progress from "@/pages/Progress";
 import Finances from "@/pages/Finances";
-import Receipts from "@/pages/Receipts";
 import CalendarPage from "@/pages/Calendar";
 import Rules from "@/pages/Rules";
 import ExportPDF from "@/pages/ExportPDF";
@@ -73,15 +69,17 @@ const AuthenticatedApp = () => {
           <Route path="/chat" element={<Chat />} />
           <Route path="/requests" element={<Requests />} />
           <Route path="/calendar" element={<CalendarPage />} />
-          <Route path="/subscribe" element={<Subscribe />} />
-          <Route path="/incidents" element={<PaywallGate feature="Incident reports"><Incidents /></PaywallGate>} />
-          <Route path="/progress" element={<PaywallGate feature="Progress tracking"><Progress /></PaywallGate>} />
-          <Route path="/finances" element={<PaywallGate feature="Expense tracking"><Finances /></PaywallGate>} />
-          <Route path="/receipts" element={<PaywallGate feature="Receipts"><Receipts /></PaywallGate>} />
-          <Route path="/rules" element={<PaywallGate feature="Co-parenting rules"><Rules /></PaywallGate>} />
-          <Route path="/daily-log" element={<PaywallGate feature="Daily logs"><DailyLog /></PaywallGate>} />
-          <Route path="/export" element={<PaywallGate feature="PDF export"><ExportPDF /></PaywallGate>} />
+          <Route path="/progress" element={<Progress />} />
+          <Route path="/finances" element={<Finances />} />
+          <Route path="/rules" element={<Rules />} />
+          <Route path="/daily-log" element={<DailyLog />} />
+          <Route path="/export" element={<ExportPDF />} />
           <Route path="/settings" element={<Settings />} />
+          {/* Removed for v1 launch: incident reports, receipt uploads, and
+              paid subscriptions. Old links redirect rather than 404. */}
+          <Route path="/incidents" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/receipts" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/subscribe" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Route>
       <Route path="*" element={<PageNotFound />} />

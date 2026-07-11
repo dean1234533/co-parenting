@@ -1,7 +1,10 @@
 import db from '@/api/db';
 import { createUserProfile } from '@/lib/userProfile';
+import { doc, getDoc } from 'firebase/firestore';
+import { firestore } from '@/lib/firebase';
+import { MAX_USERS } from '@/lib/config';
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
@@ -21,6 +24,17 @@ export default function Register() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showOtp, setShowOtp] = useState(false);
+  const [atCapacity, setAtCapacity] = useState(false);
+  const [checkingCapacity, setCheckingCapacity] = useState(true);
+
+  // Soft launch cap — protects against unbounded hosting costs while
+  // there's no paid tier. See src/lib/config.js.
+  useEffect(() => {
+    getDoc(doc(firestore, 'meta', 'stats'))
+      .then((snap) => setAtCapacity((snap.data()?.userCount || 0) >= MAX_USERS))
+      .catch(() => setAtCapacity(false))
+      .finally(() => setCheckingCapacity(false));
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -71,6 +85,31 @@ export default function Register() {
       setError(err.message || "Failed to resend code");
     }
   };
+
+  if (checkingCapacity) return null;
+
+  if (atCapacity) {
+    return (
+      <AuthLayout
+        icon={UserPlus}
+        title="We've reached capacity"
+        subtitle="Js-Grw-Up is in a limited early launch"
+        footer={
+          <>
+            Already have an account?{" "}
+            <Link to="/login" className="text-primary font-medium hover:underline">
+              Log in
+            </Link>
+          </>
+        }
+      >
+        <p className="text-sm text-muted-foreground text-center">
+          We've temporarily paused new sign-ups while we scale up. Please check back soon, or contact us at{" "}
+          <a href="mailto:support@js-grw-up.com" className="text-primary hover:underline">support@js-grw-up.com</a> to be notified when spots open up.
+        </p>
+      </AuthLayout>
+    );
+  }
 
   if (showOtp) {
     return (

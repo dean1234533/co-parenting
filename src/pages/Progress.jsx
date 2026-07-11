@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, Camera, GraduationCap, Palette, Trophy, Star, BookOpen, Sparkles } from "lucide-react";
 import { format } from "date-fns";
 import { motion } from "framer-motion";
@@ -40,7 +40,6 @@ export default function Progress() {
   const [form, setForm] = useState({
     child_name: "", category: "", title: "", description: "", date: "", photo_urls: [],
   });
-  const [uploading, setUploading] = useState(false);
   const [filter, setFilter] = useState("all");
   const queryClient = useQueryClient();
 
@@ -64,18 +63,6 @@ export default function Progress() {
       sendPartnerNotification({ title: 'New progress entry', body: `${currentUser?.full_name || 'Your co-parent'} logged a milestone${newItem.child_name ? ` for ${newItem.child_name}` : ''}: "${newItem.title}"` });
     },
   });
-
-  const handlePhotoUpload = async (e) => {
-    const files = Array.from(e.target.files);
-    setUploading(true);
-    const urls = [];
-    for (const file of files) {
-      const { file_url } = await db.integrations.Core.UploadFile({ file });
-      urls.push(file_url);
-    }
-    setForm((prev) => ({ ...prev, photo_urls: [...prev.photo_urls, ...urls] }));
-    setUploading(false);
-  };
 
   const handleCreate = () => {
     createMutation.mutate({
@@ -136,18 +123,10 @@ export default function Progress() {
               </div>
               <div>
                 <Label>Photos / Images</Label>
-                <label className="flex items-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer hover:border-primary transition-colors mt-2">
+                <div className="flex items-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg mt-2 opacity-60">
                   <Camera className="h-5 w-5 text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">{uploading ? "Uploading..." : "Upload photos or images of work"}</span>
-                  <input type="file" accept="image/*" multiple onChange={handlePhotoUpload} className="hidden" />
-                </label>
-                {form.photo_urls.length > 0 && (
-                  <div className="flex gap-2 mt-3 flex-wrap">
-                    {form.photo_urls.map((url, i) => (
-                      <img key={i} src={url} alt="" className="w-16 h-16 object-cover rounded-lg" />
-                    ))}
-                  </div>
-                )}
+                  <span className="text-sm text-muted-foreground">Photo attachments coming soon</span>
+                </div>
               </div>
               <Button onClick={handleCreate} disabled={!form.child_name || !form.title || !form.category || createMutation.isPending} className="w-full">
                 Save Entry

@@ -39,7 +39,7 @@ export default function Terms() {
         </Section>
 
         <Section title="2. Description of Service">
-          <p>Js-Grw-Up is a private communication and coordination platform designed to help separated or divorced parents manage co-parenting responsibilities. The app provides messaging, calendar sharing, expense tracking, incident reporting, and other tools.</p>
+          <p>Js-Grw-Up is a private communication and coordination platform designed to help separated or divorced parents manage co-parenting responsibilities. The app provides messaging, calendar sharing, expense tracking, and other tools.</p>
           <p>Js-Grw-Up is not a legal service and does not provide legal advice. Nothing in the app constitutes legal documentation unless exported and verified by a qualified legal professional.</p>
         </Section>
 
@@ -75,9 +75,8 @@ export default function Terms() {
           <p>You are solely responsible for the accuracy and legality of content you post. Js-Grw-Up does not verify the accuracy of user-submitted information.</p>
         </Section>
 
-        <Section title="8. Subscriptions and Billing">
-          <p>Js-Grw-Up offers a free plan and a Premium subscription billed monthly. Payments are processed securely by Stripe — we do not receive or store your card details.</p>
-          <p>Premium subscriptions renew automatically each month until cancelled. You can cancel at any time from Settings; your Premium features remain active until the end of the current billing period, after which your account reverts to the Free plan. Fees already paid are non-refundable except where required by law.</p>
+        <Section title="8. Pricing">
+          <p>Js-Grw-Up is currently free to use, with no payment or card details required. If we introduce a paid plan in the future, we will update these Terms and notify existing users in advance before any charges apply.</p>
         </Section>
 
         <Section title="9. Data and Privacy">

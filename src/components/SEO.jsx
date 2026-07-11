@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 const BASE_URL = 'https://js-grw-up.com';
 const DEFAULT_IMAGE = `${BASE_URL}/icons/icon-512x512.png`;
 const SITE_NAME = 'Js-Grw-Up';
-const DEFAULT_DESCRIPTION = 'Js-Grw-Up is the private co-parenting app for separated parents. Share a calendar, message safely, log incidents, track expenses and export court-ready records — all in one place.';
+const DEFAULT_DESCRIPTION = 'Js-Grw-Up is the private co-parenting app for separated parents. Share a calendar, message safely, track expenses and export your records — all in one place.';
 
 export default function SEO({
   title,

@@ -14,7 +14,6 @@ export default function ExportPDF() {
   const [sections, setSections] = useState({
     messages: true,
     requests: true,
-    incidents: true,
     progress: true,
     expenses: true,
     events: true,
@@ -29,10 +28,6 @@ export default function ExportPDF() {
   const { data: requests = [] } = useQuery({
     queryKey: ["requests"],
     queryFn: () => db.entities.Request.list("-created_date", 200),
-  });
-  const { data: incidents = [] } = useQuery({
-    queryKey: ["incidents"],
-    queryFn: () => db.entities.IncidentReport.list("-incident_date", 200),
   });
   const { data: progress = [] } = useQuery({
     queryKey: ["progress"],
@@ -62,7 +57,6 @@ export default function ExportPDF() {
         {
           messages:  sections.messages  ? messages  : [],
           requests:  sections.requests  ? requests  : [],
-          incidents: sections.incidents ? incidents : [],
           progress:  sections.progress  ? progress  : [],
           expenses:  sections.expenses  ? expenses  : [],
           events:    sections.events    ? events    : [],
@@ -84,7 +78,6 @@ export default function ExportPDF() {
   const sectionOptions = [
     { key: "messages", label: "Messages", count: messages.length },
     { key: "requests", label: "Requests & Approvals", count: requests.length },
-    { key: "incidents", label: "Incident Reports", count: incidents.length },
     { key: "progress", label: "Progress & Homework", count: progress.length },
     { key: "expenses", label: "Financial Records", count: expenses.length },
     { key: "events", label: "Calendar Events", count: events.length },

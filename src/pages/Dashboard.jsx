@@ -8,9 +8,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  MessageSquare, ClipboardCheck, AlertTriangle, GraduationCap,
-  PoundSterling, CalendarDays, ArrowRight, Clock
+import {
+  MessageSquare, ClipboardCheck, CalendarDays, ArrowRight, Clock
 } from "lucide-react";
 import StatCard from "@/components/dashboard/StatCard";
 import { format } from "date-fns";
@@ -42,14 +41,6 @@ export default function Dashboard() {
     },
   });
 
-  const { data: incidents = [] } = useQuery({
-    queryKey: ["incidents-recent"],
-    queryFn: async () => {
-      const all = await db.entities.IncidentReport.list();
-      return all.sort((a, b) => (b.incident_date || '').localeCompare(a.incident_date || '')).slice(0, 5);
-    },
-  });
-
   const { data: events = [] } = useQuery({
     queryKey: ["events-upcoming"],
     queryFn: async () => {
@@ -67,7 +58,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           title="Messages"
           value={messages.length}
@@ -81,13 +72,6 @@ export default function Dashboard() {
           icon={ClipboardCheck}
           color="bg-warning"
           subtitle="Awaiting response"
-        />
-        <StatCard
-          title="Incidents"
-          value={incidents.length}
-          icon={AlertTriangle}
-          color="bg-destructive"
-          subtitle="Recent reports"
         />
         <StatCard
           title="Upcoming Events"
@@ -156,35 +140,6 @@ export default function Dashboard() {
                       </p>
                     </div>
                     <p className="text-sm text-muted-foreground line-clamp-1">{msg.content}</p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Recent Incidents */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-3">
-            <CardTitle className="text-lg font-heading">Recent Incidents</CardTitle>
-            <Link to="/incidents" className="text-primary text-sm flex items-center gap-1 hover:underline">
-              View all <ArrowRight className="h-3 w-3" />
-            </Link>
-          </CardHeader>
-          <CardContent>
-            {incidents.length === 0 ? (
-              <p className="text-muted-foreground text-sm py-4 text-center">No incidents reported</p>
-            ) : (
-              <div className="space-y-3">
-                {incidents.slice(0, 3).map((inc) => (
-                  <div key={inc.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div>
-                      <p className="font-medium text-sm">{inc.child_name} — {inc.injury_type}</p>
-                      <p className="text-xs text-muted-foreground">{inc.description?.slice(0, 60)}</p>
-                    </div>
-                    <Badge variant={inc.severity === "serious" ? "destructive" : "outline"} className="capitalize">
-                      {inc.severity}
-                    </Badge>
                   </div>
                 ))}
               </div>

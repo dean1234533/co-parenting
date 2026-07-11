@@ -41,7 +41,7 @@ export default function Privacy() {
         <Section title="2. Information We Collect">
           <p><strong className="text-foreground">Account information:</strong> When you register, we collect your name, email address, and a hashed password.</p>
           <p><strong className="text-foreground">Profile information:</strong> Your display name and any information you add to your profile.</p>
-          <p><strong className="text-foreground">Communication data:</strong> Messages, calendar events, requests, incident reports, daily logs, expenses, and other content you create within the app.</p>
+          <p><strong className="text-foreground">Communication data:</strong> Messages, calendar events, requests, daily logs, expenses, and other content you create within the app.</p>
           <p><strong className="text-foreground">Device information:</strong> We may collect a device push notification token to send you notifications. This is stored securely and only used to deliver notifications from your linked co-parent.</p>
           <p><strong className="text-foreground">Usage data:</strong> Basic technical information such as the time of actions within the app, used to maintain service reliability. We do not sell this data.</p>
         </Section>
@@ -61,17 +61,17 @@ export default function Privacy() {
           <p><strong className="text-foreground">With your linked co-parent:</strong> When you link accounts, certain data is shared between you — including messages, calendar events, requests, expenses, and records. This is the core function of the app.</p>
           <p><strong className="text-foreground">Service providers (sub-processors):</strong> We use the following third parties to operate the service. Each only receives the minimum data needed to perform its function:</p>
           <ul className="list-disc pl-6 space-y-1">
-            <li><strong className="text-foreground">Firebase (Google):</strong> authentication, database storage, file storage, and push notifications.</li>
-            <li><strong className="text-foreground">Cloudflare:</strong> website hosting and the serverless functions that process payments and notifications.</li>
-            <li><strong className="text-foreground">Stripe:</strong> payment processing for Premium subscriptions. We never see or store your card details — Stripe handles them directly.</li>
+            <li><strong className="text-foreground">Firebase (Google):</strong> authentication, database storage, and push notifications.</li>
+            <li><strong className="text-foreground">Cloudflare:</strong> website hosting and the serverless functions that process account linking and notifications.</li>
           </ul>
+          <p>Js-Grw-Up is currently free to use and does not process payments. If we introduce a paid plan in future, we will update this section to name the payment processor before any payment data is collected.</p>
           <p>No other third parties have access to your personal data, and we do not sell or rent your data to anyone.</p>
           <p><strong className="text-foreground">Legal requirements:</strong> We may disclose information if required by law or to protect the rights and safety of users or the public.</p>
         </Section>
 
         <Section title="5. Data Storage and Security">
           <p>Your data is stored in Google Firebase, which provides encrypted storage and secure access controls. Data is protected in transit using TLS encryption, and Firestore/Storage encrypt data at rest by default.</p>
-          <p>Access to your data is restricted by Firestore and Storage security rules — only you and your linked co-parent can access your shared records. Security-sensitive actions (such as account deletion and payment webhooks) are verified server-side, and invite links use cryptographically random tokens that expire after 7 days.</p>
+          <p>Access to your data is restricted by Firestore and Storage security rules — only you and your linked co-parent can access your shared records. Security-sensitive actions (such as account deletion and linking with a co-parent) are verified server-side, and invite links use cryptographically random tokens that expire after 7 days.</p>
           <p>We keep an append-only audit log of certain actions (such as PDF exports) so it's possible to show who generated a record and when — this cannot be edited or deleted once written.</p>
           <p>While we take reasonable precautions to protect your data, no system is completely secure. We cannot guarantee absolute security.</p>
         </Section>
@@ -81,7 +81,7 @@ export default function Privacy() {
         </Section>
 
         <Section title="7. Data Retention">
-          <p>Your data is retained for as long as your account is active. If you delete your account, your profile, linked family data, and associated records (messages, calendar events, requests, incident reports, expenses, daily logs, progress entries and rules) are deleted from our systems. Shared content may take up to a few minutes to fully propagate deletion across all collections.</p>
+          <p>Your data is retained for as long as your account is active. If you delete your account, your profile, linked family data, and associated records (messages, calendar events, requests, expenses, daily logs, progress entries and rules) are deleted from our systems. Shared content may take up to a few minutes to fully propagate deletion across all collections.</p>
           <p>You may request deletion of specific shared records by contacting us through the app, and you may fully delete your account and all associated family data at any time from Settings.</p>
         </Section>
 

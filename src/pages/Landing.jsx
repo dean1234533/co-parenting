@@ -35,18 +35,17 @@ const features = [
   { icon: CalendarDays, title: 'Shared Calendar', desc: 'Pickups, drop-offs, school events and holidays in one shared view — always in sync.', color: 'from-blue-500 to-cyan-500', bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-200 dark:border-blue-800' },
   { icon: Check, title: 'Requests & Approvals', desc: 'Propose schedule changes and get a clear yes or no, with a reason recorded either way.', color: 'from-teal-500 to-emerald-500', bg: 'bg-teal-50 dark:bg-teal-950/30', border: 'border-teal-200 dark:border-teal-800' },
   { icon: Receipt, title: 'Expense Tracking', desc: 'Record shared costs and split them fairly, with a clear running total for both parents.', color: 'from-emerald-500 to-teal-500', bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-800' },
-  { icon: FileDown, title: 'Receipts & Shared Costs', desc: 'Upload receipts and attach them directly to expenses for a complete financial picture.', color: 'from-cyan-500 to-blue-500', bg: 'bg-cyan-50 dark:bg-cyan-950/30', border: 'border-cyan-200 dark:border-cyan-800' },
   { icon: BookOpen, title: 'Daily Logs', desc: 'Keep daily notes on meals, mood, behaviour and milestones — always on record.', color: 'from-amber-500 to-orange-500', bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200 dark:border-amber-800' },
   { icon: TrendingUp, title: 'Progress Tracking', desc: 'See patterns over time across logs, requests and milestones in one clear view.', color: 'from-pink-500 to-rose-500', bg: 'bg-pink-50 dark:bg-pink-950/30', border: 'border-pink-200 dark:border-pink-800' },
   { icon: ShieldCheck, title: 'Co-parenting Rules', desc: 'Set agreed rules and reference them any time. Requests can only be denied with a valid written reason.', color: 'from-indigo-500 to-blue-600', bg: 'bg-indigo-50 dark:bg-indigo-950/30', border: 'border-indigo-200 dark:border-indigo-800' },
-  { icon: FileText, title: 'Court-Ready PDF Records', desc: 'Export a full, timestamped archive of messages, logs and incidents for legal use.', color: 'from-rose-500 to-pink-500', bg: 'bg-rose-50 dark:bg-rose-950/30', border: 'border-rose-200 dark:border-rose-800' },
+  { icon: FileText, title: 'Exportable PDF Records', desc: 'Export a full, timestamped archive of messages, logs and requests whenever you need it.', color: 'from-rose-500 to-pink-500', bg: 'bg-rose-50 dark:bg-rose-950/30', border: 'border-rose-200 dark:border-rose-800' },
   { icon: UserPlus, title: 'Secure Account Linking', desc: 'Invite your co-parent with a simple, private link — no shared logins or awkward group chats.', color: 'from-purple-500 to-violet-600', bg: 'bg-purple-50 dark:bg-purple-950/30', border: 'border-purple-200 dark:border-purple-800' },
 ];
 
 const trustPoints = [
   { icon: Lock, title: 'Private & Secure', desc: 'Your data is encrypted and never shared. Only you and your linked co-parent can see your records.' },
   { icon: Users, title: 'Two Accounts, One Shared View', desc: 'Link accounts with a simple invite link. Both parents see the same calendar, messages and logs in real time.' },
-  { icon: FileText, title: 'Court-Ready Records', desc: 'Keep a clear, organised record that’s formatted for legal or mediation use if it’s ever needed.' },
+  { icon: FileText, title: 'Exportable Records', desc: 'Keep a clear, organised record you can export as a PDF any time you need it.' },
   { icon: FileDown, title: 'Exportable PDF Archive', desc: 'Export your full history at any time — messages, logs, requests and expenses in one document.' },
   { icon: Clock, title: 'Timestamped Communication', desc: 'Every message, request and log entry is time-stamped automatically, with nothing to edit after the fact.' },
   { icon: Heart, title: 'Designed to Reduce Conflict', desc: 'Clear structure and written records help keep conversations calm, factual and focused on the kids.' },
@@ -58,29 +57,22 @@ const steps = [
   { number: '03', title: 'Start managing everything', desc: 'Messages, calendars, requests, expenses and records — all in one organised place.' },
 ];
 
-const freePlan = [
+const planFeatures = [
   'Private messaging',
   'Shared calendar',
   'Requests & approvals',
   'Link with your co-parent',
-  'Basic daily logs',
-];
-
-const paidPlan = [
-  'Everything in Free',
-  'Incident reports',
-  'Expense tracking & receipts',
   'Daily logs',
   'Progress tracking',
+  'Expense tracking',
   'Co-parenting rules',
-  'Full PDF archive export',
-  'Priority support',
+  'PDF export',
 ];
 
 const useCases = [
   { icon: Users, title: 'Separated Parents', desc: 'A calmer way to communicate and coordinate without relying on personal messaging apps.' },
   { icon: CalendarDays, title: 'Co-parents With Shared Schedules', desc: 'Keep pickups, drop-offs and holidays clear and synced across both households.' },
-  { icon: Receipt, title: 'Parents Managing Expenses', desc: 'Track shared costs and receipts so nothing gets forgotten or disputed later.' },
+  { icon: Receipt, title: 'Parents Managing Expenses', desc: 'Track shared costs so nothing gets forgotten or disputed later.' },
   { icon: ScrollText, title: 'Parents Needing Clear Records', desc: 'Build a reliable, timestamped history for peace of mind or future reference.' },
   { icon: Heart, title: 'Families Wanting Less Conflict', desc: 'Structured tools that encourage clear, respectful communication between parents.' },
 ];
@@ -104,7 +96,7 @@ const testimonials = [
 const faqs = [
   { q: 'Is JS-GRW-UP free to start?', a: 'Yes. You can create a free account and use core features like private messaging, the shared calendar and requests without paying anything.' },
   { q: 'Can both parents access the same calendar?', a: 'Yes. Once you link accounts with your co-parent, you both see the same shared calendar, messages and logs in real time.' },
-  { q: 'Can I export records?', a: 'Yes. Premium plans include a full, timestamped PDF export of your messages, logs, requests and expenses whenever you need it.' },
+  { q: 'Can I export records?', a: 'Yes. You can export a full, timestamped PDF of your messages, logs, requests and expenses whenever you need it.' },
   { q: 'Is my data private?', a: 'Yes. Your data is encrypted and only visible to you and your linked co-parent — it’s never shared or sold.' },
   { q: 'Do I need a credit card?', a: 'No. You can create a free account and start using JS-GRW-UP without entering any payment details.' },
   { q: 'Can I use it on mobile?', a: 'Yes. JS-GRW-UP is designed mobile-first, so it works smoothly on your phone, tablet or desktop.' },
@@ -208,7 +200,7 @@ export default function Landing() {
       <SEO
         path="/"
         title="Co-parenting App for Separated Parents"
-        description="JS-GRW-UP is the private co-parenting app for separated parents. Shared calendar, safe messaging, incident reports, expense tracking and court-ready PDF export. Free to start."
+        description="JS-GRW-UP is the private co-parenting app for separated parents. Shared calendar, safe messaging, expense tracking and exportable PDF records. Free to start."
       />
 
       {/* Nav */}
@@ -484,64 +476,34 @@ export default function Landing() {
 
       {/* Pricing */}
       <section id="pricing" className="bg-gradient-to-b from-background to-violet-50 dark:to-violet-950/20">
-        <div className="max-w-4xl mx-auto px-6 py-20 lg:py-24">
+        <div className="max-w-md mx-auto px-6 py-20 lg:py-24">
           <div className="text-center mb-16">
             <SectionBadge icon={Sparkles} className="bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300">
               Pricing
             </SectionBadge>
-            <h2 className="text-3xl font-heading font-bold mb-3">Simple, honest pricing</h2>
-            <p className="text-muted-foreground">Start free. Upgrade when you need more. Cancel any time.</p>
+            <h2 className="text-3xl font-heading font-bold mb-3">Free during early access</h2>
+            <p className="text-muted-foreground">Every feature, free while we're getting started. No credit card needed.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 
-            {/* Free */}
-            <div className="bg-card border-2 border-border rounded-2xl p-8">
-              <SectionBadge icon={Check} className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300">
-                Always free
-              </SectionBadge>
-              <h3 className="text-2xl font-heading font-bold mb-1">Free</h3>
-              <div className="text-5xl font-bold mb-6 text-foreground">£0<span className="text-lg font-normal text-muted-foreground">/month</span></div>
-              <ul className="space-y-3 mb-8">
-                {freePlan.map((f) => (
-                  <li key={f} className="flex items-center gap-3 text-sm">
-                    <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
-                      <Check className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
-                    </div>
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link to="/register" className="block w-full text-center border-2 border-border px-6 py-3.5 rounded-xl font-semibold text-sm hover:bg-muted transition-colors">
-                Get Started Free
-              </Link>
-            </div>
-
-            {/* Premium */}
-            <div className="rounded-2xl p-[3px] bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500 shadow-2xl shadow-violet-500/30 relative">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-violet-600 to-pink-600 text-white text-xs font-bold px-5 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg">
-                <Sparkles className="h-3 w-3" /> Most popular
-              </div>
-              <div className="bg-card rounded-[14px] p-8 h-full">
-                <SectionBadge icon={Sparkles} className="bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300">
-                  Premium
-                </SectionBadge>
-                <h3 className="text-2xl font-heading font-bold mb-1">Premium</h3>
-                <div className="text-5xl font-bold mb-6 bg-gradient-to-r from-violet-600 to-pink-600 bg-clip-text text-transparent">£5<span className="text-lg font-normal text-muted-foreground">/month</span></div>
-                <ul className="space-y-3 mb-8">
-                  {paidPlan.map((f) => (
-                    <li key={f} className="flex items-center gap-3 text-sm">
-                      <div className="w-5 h-5 rounded-full bg-violet-100 dark:bg-violet-900/50 flex items-center justify-center shrink-0">
-                        <Check className="h-3 w-3 text-violet-600 dark:text-violet-400" />
-                      </div>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link to="/register" className="block w-full text-center bg-gradient-to-r from-violet-600 to-pink-600 text-white px-6 py-3.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-violet-500/30">
-                  Start Free, Upgrade Later
-                </Link>
-              </div>
-            </div>
+          <div className="bg-card border-2 border-border rounded-2xl p-8">
+            <SectionBadge icon={Check} className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300">
+              Free
+            </SectionBadge>
+            <h3 className="text-2xl font-heading font-bold mb-1">Everything included</h3>
+            <div className="text-5xl font-bold mb-6 text-foreground">£0<span className="text-lg font-normal text-muted-foreground">/month</span></div>
+            <ul className="space-y-3 mb-8">
+              {planFeatures.map((f) => (
+                <li key={f} className="flex items-center gap-3 text-sm">
+                  <div className="w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 flex items-center justify-center shrink-0">
+                    <Check className="h-3 w-3 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <Link to="/register" className="block w-full text-center bg-gradient-to-r from-violet-600 to-pink-600 text-white px-6 py-3.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-lg shadow-violet-500/30">
+              Get Started Free
+            </Link>
           </div>
           <p className="text-xs text-muted-foreground text-center mt-8">No credit card needed to start.</p>
         </div>
