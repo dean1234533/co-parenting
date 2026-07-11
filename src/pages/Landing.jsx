@@ -45,7 +45,6 @@ const features = [
 const trustPoints = [
   { icon: Lock, title: 'Private & Secure', desc: 'Your data is encrypted and never shared. Only you and your linked co-parent can see your records.' },
   { icon: Users, title: 'Two Accounts, One Shared View', desc: 'Link accounts with a simple invite link. Both parents see the same calendar, messages and logs in real time.' },
-  { icon: FileText, title: 'Exportable Records', desc: 'Keep a clear, organised record you can export as a PDF any time you need it.' },
   { icon: FileDown, title: 'Exportable PDF Archive', desc: 'Export your full history at any time — messages, logs, requests and expenses in one document.' },
   { icon: Clock, title: 'Timestamped Communication', desc: 'Every message, request and log entry is time-stamped automatically, with nothing to edit after the fact.' },
   { icon: Heart, title: 'Designed to Reduce Conflict', desc: 'Clear structure and written records help keep conversations calm, factual and focused on the kids.' },
