@@ -158,6 +158,17 @@ export default function Sidebar() {
           <p className="text-xs text-sidebar-foreground/40 text-center">
             Keeping it civil, for the kids
           </p>
+          <p className="text-xs text-sidebar-foreground/30 text-center">
+            Created by{" "}
+            <a
+              href="https://dean-da-dev.co.uk"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-sidebar-foreground/60 transition-colors"
+            >
+              Dean Da Dev
+            </a>
+          </p>
         </div>
       </aside>
       {showInvite && <InvitePartner onClose={() => setShowInvite(false)} />}
