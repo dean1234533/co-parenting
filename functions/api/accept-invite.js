@@ -22,7 +22,9 @@ async function getAdminToken(saEmail, privateKeyPem) {
   const header = b64url({ alg: 'RS256', typ: 'JWT' });
   const payload = b64url({
     iss: saEmail,
-    scope: 'https://www.googleapis.com/auth/cloud-platform',
+    // cloud-platform for Firestore admin access, firebase.messaging so the
+    // same token can also push the "accounts linked" notification below.
+    scope: 'https://www.googleapis.com/auth/cloud-platform https://www.googleapis.com/auth/firebase.messaging',
     aud: 'https://oauth2.googleapis.com/token',
     iat: now,
     exp: now + 3600,
@@ -91,6 +93,39 @@ async function fsSet(fsBase, adminToken, path, fields) {
     body: JSON.stringify({ fields: fsFields(fields) }),
   });
   if (!res.ok) throw new Error(`Firestore write failed: ${await res.text()}`);
+}
+
+// Best-effort push to the inviter confirming the link — failure here must
+// never fail the linking request itself, since the accounts are already
+// linked by the time this runs.
+async function notifyLinked(fsBase, adminToken, projectId, inviterUid, acceptorName) {
+  try {
+    const tokenDoc = await fsGet(fsBase, adminToken, `fcmTokens/${inviterUid}`);
+    const fcmToken = tokenDoc?.token;
+    if (!fcmToken) return;
+
+    await fetch(`https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${adminToken}` },
+      body: JSON.stringify({
+        message: {
+          token: fcmToken,
+          notification: {
+            title: 'Accounts linked!',
+            body: `${acceptorName || 'Your co-parent'} accepted your invite — you're now linked on Js-Grw-Up.`,
+          },
+          android: { priority: 'high' },
+          apns: { payload: { aps: { sound: 'default', badge: 1 } } },
+          webpush: {
+            notification: { icon: '/icons/icon.svg', badge: '/icons/icon.svg' },
+            fcm_options: { link: '/' },
+          },
+        },
+      }),
+    });
+  } catch {
+    // Non-fatal — linking already succeeded.
+  }
 }
 
 const ALLOWED_ORIGIN = 'https://js-grw-up.com';
@@ -180,6 +215,8 @@ export async function onRequestPost({ request, env }) {
   await fsSet(fsBase, adminToken, `invites/${token}`, {
     ...invite, status: 'accepted', acceptedBy: uid, acceptedAt: new Date().toISOString(),
   });
+
+  await notifyLinked(fsBase, adminToken, PROJECT_ID, inviterUid, myProfile.displayName);
 
   return jsonRes({ success: true, familyId }, 200, origin);
 }

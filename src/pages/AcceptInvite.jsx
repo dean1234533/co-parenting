@@ -4,7 +4,6 @@ import { Heart, Loader2, AlertTriangle, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getInvite, acceptInvite } from '@/lib/invite';
 import { useAuth } from '@/lib/AuthContext';
-import { sendPartnerNotification } from '@/lib/notify';
 import AuthLayout from '@/components/AuthLayout';
 
 export default function AcceptInvite() {
@@ -43,7 +42,6 @@ export default function AcceptInvite() {
     try {
       await acceptInvite(token);
       await refreshProfile();
-      sendPartnerNotification({ title: 'Accounts linked!', body: `${invite?.createdByName ? `You and ${invite.createdByName} are` : 'Your accounts are'} now linked on Js-Grw-Up` });
       setDone(true);
       setTimeout(() => navigate('/'), 2000);
     } catch (err) {
